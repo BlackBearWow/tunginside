@@ -2,9 +2,12 @@ package uman.tunginside.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.Length;
 
 @Entity
-@Table(uniqueConstraints = {
+@Table(
+        name = "category",
+        uniqueConstraints = {
         @UniqueConstraint(columnNames = {"name"}),
         @UniqueConstraint(columnNames = {"abbreviation"})
 })
@@ -15,8 +18,8 @@ public class Category {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
-    @NotNull
+    @NotNull @Length(max = 60)
     private String name;
-    @NotNull
+    @NotNull @Length(max = 20)
     private String abbreviation;
 }
