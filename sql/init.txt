@@ -1,0 +1,16 @@
+먼저 mysql을 root로 접속해 db를 생성한다.
+
+mysql -u root -p
+
+CREATE DATABASE tunginside DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+show databases; 로 잘 생성되었는지 확인.
+
+새로운 계정을 생성한다.
+CREATE USER 'tungtungtung'@'localhost' IDENTIFIED BY 'sahur';
+
+tunginside db를 조작할 수 있는 모든 권한을 부여
+GRANT ALL PRIVILEGES ON tunginside.* TO 'tungtungtung'@'localhost';
+
+변경 적용
+FLUSH PRIVILEGES;
