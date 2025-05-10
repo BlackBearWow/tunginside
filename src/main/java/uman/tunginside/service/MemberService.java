@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uman.tunginside.domain.LoginForm;
 import uman.tunginside.domain.Member;
+import uman.tunginside.domain.MemberSignupForm;
 import uman.tunginside.exception.DuplicateNicknameException;
 import uman.tunginside.exception.DuplicateUseridException;
 import uman.tunginside.exception.LoginFailException;
 import uman.tunginside.repository.MemberRepository;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -15,18 +18,39 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    public void signup(Member member) {
+    public void signup(MemberSignupForm memberSignupForm) {
         // 중복 아이디 회원 검색
-        if(memberRepository.existsByUserid(member.getUserid())) {
+        if(memberRepository.existsByUserid(memberSignupForm.getUserid())) {
             throw new DuplicateUseridException("이미 사용중인 아이디입니다");
         }
-        System.out.println("------------------------");
         // 중복 닉네임 회원 검색
-        if(memberRepository.existsByNickname(member.getNickname())) {
+        if(memberRepository.existsByNickname(memberSignupForm.getNickname())) {
             throw new DuplicateNicknameException("이미 사용중인 닉네임입니다");
         }
         // 중복이 없다면 세이브
+        Member member = new Member();
+        member.setUserid(memberSignupForm.getUserid());
+        member.setPassword(memberSignupForm.getPassword());
+        member.setNickname(memberSignupForm.getNickname());
+        member.setCreate_at(LocalDateTime.now());
         memberRepository.save(member);
+    }
+
+    public Member update(MemberSignupForm memberSignupForm, Member member) {
+        // 중복 아이디 회원 검색. 자신의 아이디는 중복 검사하지 않는다.
+        if(!memberSignupForm.getUserid().equals(member.getUserid())) {
+            if(memberRepository.existsByUserid(memberSignupForm.getUserid())) {
+                throw new DuplicateUseridException("이미 사용중인 아이디입니다");
+            }
+        }
+        // 중복 닉네임 회원 검색. 자신의 닉네임은 중복 검사하지 않는다.
+        if(!memberSignupForm.getNickname().equals(member.getNickname())) {
+            if(memberRepository.existsByNickname(memberSignupForm.getNickname())) {
+                throw new DuplicateNicknameException("이미 사용중인 닉네임입니다");
+            }
+        }
+        // 중복이 없다면 업데이트
+        return memberRepository.update(member.getId(), memberSignupForm.getUserid(), memberSignupForm.getPassword(), memberSignupForm.getNickname());
     }
 
     public Member login(LoginForm loginForm) {

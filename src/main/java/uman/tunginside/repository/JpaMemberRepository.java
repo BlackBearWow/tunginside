@@ -21,6 +21,17 @@ public class JpaMemberRepository implements MemberRepository {
     }
 
     @Override
+    public Member update(Long id, String userid, String password, String nickname) {
+        Member member = this.findById(id).get();
+        member.setUserid(userid);
+        member.setPassword(password);
+        member.setNickname(nickname);
+//        em.flush();
+//        em.clear();
+        return member;
+    }
+
+    @Override
     public Optional<Member> findById(long id) {
         return Optional.ofNullable(em.find(Member.class, id));
     }

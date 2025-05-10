@@ -1,9 +1,13 @@
 package uman.tunginside.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
+@Getter @Setter
 @Entity
 @Table(
         name = "category",
@@ -17,6 +21,7 @@ public class Category {
     private Long id;
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Member member;
     @NotNull @Length(max = 60)
     private String name;
