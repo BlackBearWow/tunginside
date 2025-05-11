@@ -17,7 +17,7 @@ public class PostLike {
     private Post post;
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
-    @Length(max = 10)
+    @Length(max = 15)
     private String ip_addr;
     @NotNull
     private LocalDateTime created_at;

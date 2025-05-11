@@ -15,7 +15,7 @@ public class Comment {
     private Post post;
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
-    @Length(max = 10)
+    @Length(max = 15)
     private String ip_addr;
     @Length(max = 20)
     private String password;
