@@ -2,8 +2,13 @@ package uman.tunginside.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
+import java.time.LocalDateTime;
+
+@Getter @Setter
 @Entity
 @Table(name = "comments")
 public class Comment {
@@ -19,6 +24,11 @@ public class Comment {
     private String ip_addr;
     @Length(max = 20)
     private String password;
+    @NotNull @Length(max = 500)
+    private String content;
+    @NotNull
+    private LocalDateTime create_at;
+    private LocalDateTime last_modified_at;
     @ManyToOne(fetch = FetchType.LAZY)
-    private Comment comment;
+    private Comment prev_comment;
 }

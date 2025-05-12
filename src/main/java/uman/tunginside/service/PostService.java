@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uman.tunginside.domain.*;
 import uman.tunginside.repository.CategoryRepository;
+import uman.tunginside.repository.PostDislikeRepository;
 import uman.tunginside.repository.PostLikeRepository;
 import uman.tunginside.repository.PostRepository;
 
@@ -17,6 +18,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
     private final PostLikeRepository postLikeRepository;
+    private final PostDislikeRepository postDislikeRepository;
 
     public void writePost(PostWriteForm postWriteForm, Member member, String ip_addr) {
         Post post = new Post();
@@ -51,7 +53,7 @@ public class PostService {
     }
 
     public PostDetailDTO getPostDetail(Long postId) {
-        return postRepository.findDetailById(postId);
+        return postRepository.findDetailById(postId).orElseThrow(() -> new RuntimeException("없는 게시글입니다"));
     }
 
     public void updatePost(PostUpdateForm postUpdateForm, Long postId, Member member, String ip_addr) {
@@ -79,7 +81,6 @@ public class PostService {
     public void postLike(Long post_id, Member member, String ip_addr) {
         Post post = postRepository.findById(post_id).orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다"));
         PostLike postLike = new PostLike();
-        postLike.setPost(post);
         if(member != null) {
             postLikeRepository.findByPostAndMember(post, member)
                     .ifPresent((pl)-> {throw new RuntimeException("좋아요는 게시물 하나당 한번씩 가능합니다");});
@@ -90,9 +91,30 @@ public class PostService {
                     .ifPresent((pl)-> {throw new RuntimeException("좋아요는 게시물 하나당 한번씩 가능합니다");});
             postLike.setIp_addr(ip_addr);
         }
+        postLike.setPost(post);
         postLike.setCreated_at(LocalDateTime.now());
         postLikeRepository.save(postLike);
         // 좋아요 개수 늘리기
         postRepository.increaseLikeCount(post_id);
+    }
+
+    public void postDislike(Long post_id, Member member, String ip_addr) {
+        Post post = postRepository.findById(post_id).orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다"));
+        PostDislike postDislike = new PostDislike();
+        if(member != null) {
+            postDislikeRepository.findByPostAndMember(post, member)
+                    .ifPresent((pdl)->{throw new RuntimeException("싫어요는 게시물 하나당 한번씩 가능합니다");});
+            postDislike.setMember(member);
+        }
+        else {
+            postDislikeRepository.findByPostAndIp(post, ip_addr)
+                    .ifPresent((pdl)->{throw new RuntimeException("싫어요는 게시물 하나당 한번씩 가능합니다");});
+            postDislike.setIp_addr(ip_addr);
+        }
+        postDislike.setPost(post);
+        postDislike.setCreated_at(LocalDateTime.now());
+        postDislikeRepository.save(postDislike);
+        // 싫어요 개수 늘리기
+        postRepository.increaseDislikeCount(post_id);
     }
 }

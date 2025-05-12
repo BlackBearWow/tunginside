@@ -79,14 +79,20 @@ public class JpaPostRepository implements PostRepository {
     }
 
     @Override
-    public PostDetailDTO findDetailById(Long postId) {
+    public Optional<PostDetailDTO> findDetailById(Long postId) {
         return em.createQuery("select p.id, c.name, c.abbreviation, m.nickname, p.ip_addr, p.last_modified_ip, p.create_at, p.last_modified_at, p.title, p.content, p.post_like_count, p.post_dislike_count, p.comment_count from Post p join p.category c on p.id = :postId left join p.member m", PostDetailDTO.class)
-                .setParameter("postId", postId).getSingleResult();
+                .setParameter("postId", postId).getResultList().stream().findFirst();
     }
 
     @Override
     public void increaseLikeCount(Long postId) {
         Post post = em.find(Post.class, postId);
         post.setPost_like_count(post.getPost_like_count() + 1);
+    }
+
+    @Override
+    public void increaseDislikeCount(Long postId) {
+        Post post = em.find(Post.class, postId);
+        post.setPost_dislike_count(post.getPost_dislike_count() + 1);
     }
 }

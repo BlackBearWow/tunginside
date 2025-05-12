@@ -52,6 +52,12 @@ public class PostController {
     @GetMapping("/{post_id}/like")
     public String likePost(@PathVariable Long post_id, @SessionAttribute(value = "member", required = false) Member member, HttpServletRequest request) {
         postService.postLike(post_id, member, request.getRemoteAddr());
-        return "좋아요!";
+        return "좋아요 성공";
+    }
+
+    @GetMapping("/{post_id}/dislike")
+    public String dislikePost(@PathVariable Long post_id, @SessionAttribute(value = "member", required = false) Member member, HttpServletRequest request) {
+        postService.postDislike(post_id, member, request.getRemoteAddr());
+        return "싫어요 성공";
     }
 }

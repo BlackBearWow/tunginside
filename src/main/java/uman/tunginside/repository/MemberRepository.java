@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface MemberRepository {
     void save(Member member);
-    Member update(Long id, String userid, String password, String nickname);
+    void update(Long id, String userid, String password, String nickname);
     Optional<Member> findById(long id);
     Optional<Member> findByUserid(String userid);
     void delete(Member member);

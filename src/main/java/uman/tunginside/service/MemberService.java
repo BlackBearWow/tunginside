@@ -1,5 +1,6 @@
 package uman.tunginside.service;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uman.tunginside.domain.LoginForm;
@@ -36,7 +37,7 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public Member update(MemberSignupForm memberSignupForm, Member member) {
+    public void update(MemberSignupForm memberSignupForm, Member member, HttpSession session) {
         // 중복 아이디 회원 검색. 자신의 아이디는 중복 검사하지 않는다.
         if(!memberSignupForm.getUserid().equals(member.getUserid())) {
             if(memberRepository.existsByUserid(memberSignupForm.getUserid())) {
@@ -50,7 +51,8 @@ public class MemberService {
             }
         }
         // 중복이 없다면 업데이트
-        return memberRepository.update(member.getId(), memberSignupForm.getUserid(), memberSignupForm.getPassword(), memberSignupForm.getNickname());
+        memberRepository.update(member.getId(), memberSignupForm.getUserid(), memberSignupForm.getPassword(), memberSignupForm.getNickname());
+        session.setAttribute("member", memberRepository.findById(member.getId()).get());
     }
 
     public Member login(LoginForm loginForm) {

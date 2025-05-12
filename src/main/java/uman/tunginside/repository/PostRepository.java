@@ -1,7 +1,5 @@
 package uman.tunginside.repository;
 
-import jakarta.validation.constraints.NotNull;
-import org.hibernate.validator.constraints.Length;
 import uman.tunginside.domain.Post;
 import uman.tunginside.domain.PostDetailDTO;
 import uman.tunginside.domain.PostSummaryDTO;
@@ -18,6 +16,7 @@ public interface PostRepository {
     public Optional<Post> findByAbbreviation(String abbreviation);
     List<PostSummaryDTO> findByConditions(String abbr, Integer page, Integer likeCut, String search);
     List<PostSummaryDTO> findByLikeCut(Integer likeCut);
-    PostDetailDTO findDetailById(Long postId);
+    Optional<PostDetailDTO> findDetailById(Long postId);
     void increaseLikeCount(Long postId);
+    void increaseDislikeCount(Long postId);
 }
