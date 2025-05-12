@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uman.tunginside.domain.*;
 import uman.tunginside.repository.CategoryRepository;
+import uman.tunginside.repository.PostLikeRepository;
 import uman.tunginside.repository.PostRepository;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
+    private final PostLikeRepository postLikeRepository;
 
     public void writePost(PostWriteForm postWriteForm, Member member, String ip_addr) {
         Post post = new Post();
@@ -40,11 +42,57 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public List<PostSummaryDTO> getPosts(PostGetForm postGetForm) {
+    public List<PostSummaryDTO> getPostSummaryDTOs(PostGetForm postGetForm) {
         return postRepository.findByConditions(postGetForm.getAbbr(), postGetForm.getPage(), postGetForm.getLike_cut(), postGetForm.getSearch());
     }
 
     public List<PostSummaryDTO> getBestPosts() {
         return postRepository.findByLikeCut(3);
+    }
+
+    public PostDetailDTO getPostDetail(Long postId) {
+        return postRepository.findDetailById(postId);
+    }
+
+    public void updatePost(PostUpdateForm postUpdateForm, Long postId, Member member, String ip_addr) {
+        Post resultPost = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("없는 게시글입니다"));
+        // 자신이 쓴 글이거나 패스워드가 맞아야 수정 권한이 있다.
+        if(resultPost.getMember().getId().equals(member.getId()) || resultPost.getPassword().equals(postUpdateForm.getPassword())) {
+            postRepository.update(postUpdateForm, postId, ip_addr);
+        }
+        else {
+            throw new RuntimeException("자신이 쓴 글이 아니거나 비밀번호가 틀립니다");
+        }
+    }
+
+    public void deletePost(Long postId, String password, Member member) {
+        Post resultPost = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("없는 게시글입니다"));
+        // 자신이 쓴 글이거나 패스워드가 맞아야 수정 권한이 있다.
+        if(resultPost.getMember().getId().equals(member.getId()) || resultPost.getPassword().equals(password)) {
+            postRepository.remove(postId);
+        }
+        else {
+            throw new RuntimeException("자신이 쓴 글이 아니거나 비밀번호가 틀립니다");
+        }
+    }
+
+    public void postLike(Long post_id, Member member, String ip_addr) {
+        Post post = postRepository.findById(post_id).orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다"));
+        PostLike postLike = new PostLike();
+        postLike.setPost(post);
+        if(member != null) {
+            postLikeRepository.findByPostAndMember(post, member)
+                    .ifPresent((pl)-> {throw new RuntimeException("좋아요는 게시물 하나당 한번씩 가능합니다");});
+            postLike.setMember(member);
+        }
+        else {
+            postLikeRepository.findByPostAndIp(post, ip_addr)
+                    .ifPresent((pl)-> {throw new RuntimeException("좋아요는 게시물 하나당 한번씩 가능합니다");});
+            postLike.setIp_addr(ip_addr);
+        }
+        postLike.setCreated_at(LocalDateTime.now());
+        postLikeRepository.save(postLike);
+        // 좋아요 개수 늘리기
+        postRepository.increaseLikeCount(post_id);
     }
 }

@@ -6,8 +6,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import uman.tunginside.domain.Post;
+import uman.tunginside.domain.PostDetailDTO;
 import uman.tunginside.domain.PostSummaryDTO;
+import uman.tunginside.domain.PostUpdateForm;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +24,21 @@ public class JpaPostRepository implements PostRepository {
     @Override
     public void save(Post post) {
         em.persist(post);
+    }
+
+    @Override
+    public void update(PostUpdateForm postUpdateForm, Long post_id, String ip_addr) {
+        Post post = em.find(Post.class, post_id);
+        post.setTitle(postUpdateForm.getTitle());
+        post.setContent(postUpdateForm.getContent());
+        post.setLast_modified_ip(ip_addr);
+        post.setLast_modified_at(LocalDateTime.now());
+    }
+
+    @Override
+    public void remove(Long postId) {
+        Post post = em.find(Post.class, postId);
+        em.remove(post);
     }
 
     @Override
@@ -58,5 +76,17 @@ public class JpaPostRepository implements PostRepository {
     public List<PostSummaryDTO> findByLikeCut(Integer likeCut) {
         return em.createQuery("select p.id, m.nickname, p.title, p.ip_addr, p.post_like_count, p.comment_count from Post p left join p.member m where p.post_like_count >= :likeCut", PostSummaryDTO.class)
                 .setParameter("likeCut", likeCut).getResultList();
+    }
+
+    @Override
+    public PostDetailDTO findDetailById(Long postId) {
+        return em.createQuery("select p.id, c.name, c.abbreviation, m.nickname, p.ip_addr, p.last_modified_ip, p.create_at, p.last_modified_at, p.title, p.content, p.post_like_count, p.post_dislike_count, p.comment_count from Post p join p.category c on p.id = :postId left join p.member m", PostDetailDTO.class)
+                .setParameter("postId", postId).getSingleResult();
+    }
+
+    @Override
+    public void increaseLikeCount(Long postId) {
+        Post post = em.find(Post.class, postId);
+        post.setPost_like_count(post.getPost_like_count() + 1);
     }
 }

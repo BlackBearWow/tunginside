@@ -2,10 +2,13 @@ package uman.tunginside.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 
+@Getter @Setter
 @Entity
 @Table(name = "post_like")
 public class PostLike {

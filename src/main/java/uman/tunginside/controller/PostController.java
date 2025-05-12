@@ -23,12 +23,35 @@ public class PostController {
     }
 
     @GetMapping
-    public List<PostSummaryDTO> getPosts(@Validated PostGetForm postGetForm) {
-        return postService.getPosts(postGetForm);
+    public List<PostSummaryDTO> getPostSummaryDTOsByConditions(@Validated PostGetForm postGetForm) {
+        return postService.getPostSummaryDTOs(postGetForm);
     }
 
     @GetMapping("/best")
     public List<PostSummaryDTO> getBestPosts() {
         return postService.getBestPosts();
+    }
+
+    @GetMapping("/{post_id}")
+    public PostDetailDTO getPostDetail(@PathVariable Long post_id) {
+        return postService.getPostDetail(post_id);
+    }
+
+    @PutMapping("/{post_id}")
+    public String updatePost(@Validated PostUpdateForm postUpdateForm, @PathVariable Long post_id, @SessionAttribute(value = "member", required = false) Member member, HttpServletRequest request) {
+        postService.updatePost(postUpdateForm, post_id, member, request.getRemoteAddr());
+        return "수정 성공";
+    }
+
+    @DeleteMapping("/{post_id}")
+    public String deletePost(@RequestParam(required = false) String password, @PathVariable Long post_id, @SessionAttribute(value = "member", required = false) Member member) {
+        postService.deletePost(post_id, password, member);
+        return "삭제 성공";
+    }
+
+    @GetMapping("/{post_id}/like")
+    public String likePost(@PathVariable Long post_id, @SessionAttribute(value = "member", required = false) Member member, HttpServletRequest request) {
+        postService.postLike(post_id, member, request.getRemoteAddr());
+        return "좋아요!";
     }
 }

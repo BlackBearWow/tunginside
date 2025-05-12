@@ -25,6 +25,8 @@ public class Post {
     private Member member;
     @Length(max = 15)
     private String ip_addr;
+    @Length(max = 15)
+    private String last_modified_ip;
     private String password;
     @NotNull
     private LocalDateTime create_at;
