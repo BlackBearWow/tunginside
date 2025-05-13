@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uman.tunginside.domain.Category;
 import uman.tunginside.domain.CategoryRegisterForm;
 import uman.tunginside.domain.Member;
+import uman.tunginside.exception.BadRequestException;
 import uman.tunginside.repository.CategoryRepository;
 
 import java.util.List;
@@ -22,11 +23,11 @@ public class CategoryService {
     public String registerCategory(CategoryRegisterForm categoryRegisterForm, Member member) {
         // 중복 이름 검색
         if(categoryRepository.existByName(categoryRegisterForm.getName())) {
-            throw new RuntimeException("이름이 이미 있습니다");
+            throw new BadRequestException("이름이 이미 있습니다");
         }
         // 중복 줄임말 검색
         if(categoryRepository.existsByAbbreviation(categoryRegisterForm.getAbbreviation())) {
-            throw new RuntimeException("줄임말이 이미 있습니다");
+            throw new BadRequestException("줄임말이 이미 있습니다");
         }
         // 중복 검사 통과라면 저장
         Category category = new Category();
@@ -39,12 +40,12 @@ public class CategoryService {
 
     public String deleteCategory(Member member, String abbreviation) {
         Category category = categoryRepository.findByAbbreviation(abbreviation)
-                .orElseThrow(() -> new RuntimeException("없는 카테코리입니다"));
+                .orElseThrow(() -> new BadRequestException("없는 카테코리입니다"));
         if (category.getMember().getId().equals(member.getId())) {
             categoryRepository.delete(category);
             return "카테고리 삭제 성공";
         }
         else 
-            throw new RuntimeException("권한이 없습니다");
+            throw new BadRequestException("권한이 없습니다");
     }
 }

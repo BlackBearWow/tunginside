@@ -44,7 +44,6 @@ public class MemberController {
     @PutMapping
     public String updateMember(@RequestBody @Validated MemberSignupForm memberSignupForm, @SessionAttribute(name = "member") Member member, HttpSession session) {
         memberService.update(memberSignupForm, member, session);
-//        session.setAttribute("member", memberService.update(memberSignupForm, member));
         return "업데이트 성공";
     }
 

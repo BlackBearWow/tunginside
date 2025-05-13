@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import uman.tunginside.domain.Category;
+import uman.tunginside.domain.CategoryDeleteForm;
 import uman.tunginside.domain.CategoryRegisterForm;
 import uman.tunginside.domain.Member;
 import uman.tunginside.service.CategoryService;
@@ -30,7 +31,7 @@ public class CategoryController {
     }
 
     @DeleteMapping
-    public String deleteCategory(@SessionAttribute("member") Member member, @RequestParam String abbreviation) {
-        return categoryService.deleteCategory(member, abbreviation);
+    public String deleteCategory(@SessionAttribute("member") Member member, @RequestBody CategoryDeleteForm categoryDeleteForm) {
+        return categoryService.deleteCategory(member, categoryDeleteForm.getAbbreviation());
     }
 }

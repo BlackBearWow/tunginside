@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
@@ -29,6 +30,8 @@ public class Comment {
     @NotNull
     private LocalDateTime create_at;
     private LocalDateTime last_modified_at;
+    @NotNull
+    private Boolean deleted;
     @ManyToOne(fetch = FetchType.LAZY)
     private Comment prev_comment;
 }

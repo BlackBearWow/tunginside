@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import uman.tunginside.exception.BadRequestException;
 import uman.tunginside.exception.DuplicateNicknameException;
 import uman.tunginside.exception.DuplicateUseridException;
 import uman.tunginside.exception.LoginFailException;
@@ -65,8 +66,8 @@ public class ExControllerAdvice {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(RuntimeException.class)
-    public Map<String, String> handleRuntimeException(RuntimeException ex) {
+    @ExceptionHandler(BadRequestException.class)
+    public Map<String, String> handleBadRequestException(BadRequestException ex) {
         Map<String, String> errors = new HashMap<>();
         errors.put("message", ex.getMessage());
         return errors;
