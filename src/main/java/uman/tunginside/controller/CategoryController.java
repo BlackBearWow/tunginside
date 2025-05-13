@@ -25,7 +25,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public String createCategory(@Validated CategoryRegisterForm categoryRegisterForm, @SessionAttribute("member") Member member) {
+    public String createCategory(@RequestBody @Validated CategoryRegisterForm categoryRegisterForm, @SessionAttribute("member") Member member) {
         return categoryService.registerCategory(categoryRegisterForm, member);
     }
 

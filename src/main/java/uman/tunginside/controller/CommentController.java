@@ -17,7 +17,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/{post_id}")
-    public String writeComment(@PathVariable Long post_id, @Validated CommentWriteForm commentWriteForm, @SessionAttribute(value = "member", required = false) Member member, HttpServletRequest request) {
+    public String writeComment(@PathVariable Long post_id, @RequestBody @Validated CommentWriteForm commentWriteForm, @SessionAttribute(value = "member", required = false) Member member, HttpServletRequest request) {
         commentService.writeComment(post_id, commentWriteForm, member, request.getRemoteAddr());
         return "댓글작성 성공";
     }

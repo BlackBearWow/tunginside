@@ -17,13 +17,13 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    public String save(@Validated PostWriteForm postWriteForm, @SessionAttribute(value = "member", required = false) Member member, HttpServletRequest request) {
+    public String save(@RequestBody @Validated PostWriteForm postWriteForm, @SessionAttribute(value = "member", required = false) Member member, HttpServletRequest request) {
         postService.writePost(postWriteForm, member, request.getRemoteAddr());
         return "글쓰기 성공";
     }
 
     @GetMapping
-    public List<PostSummaryDTO> getPostSummaryDTOsByConditions(@Validated PostGetForm postGetForm) {
+    public List<PostSummaryDTO> getPostSummaryDTOsByConditions(@RequestBody @Validated PostGetForm postGetForm) {
         return postService.getPostSummaryDTOs(postGetForm);
     }
 
@@ -38,7 +38,7 @@ public class PostController {
     }
 
     @PutMapping("/{post_id}")
-    public String updatePost(@Validated PostUpdateForm postUpdateForm, @PathVariable Long post_id, @SessionAttribute(value = "member", required = false) Member member, HttpServletRequest request) {
+    public String updatePost(@RequestBody @Validated PostUpdateForm postUpdateForm, @PathVariable Long post_id, @SessionAttribute(value = "member", required = false) Member member, HttpServletRequest request) {
         postService.updatePost(postUpdateForm, post_id, member, request.getRemoteAddr());
         return "수정 성공";
     }
