@@ -11,7 +11,6 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-@Transactional
 public class JpaCategoryRepository implements CategoryRepository {
 
     private final EntityManager em;

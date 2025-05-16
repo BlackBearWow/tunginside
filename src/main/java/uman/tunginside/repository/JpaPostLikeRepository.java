@@ -11,7 +11,6 @@ import uman.tunginside.domain.PostLike;
 import java.util.Optional;
 
 @Repository
-@Transactional
 @RequiredArgsConstructor
 public class JpaPostLikeRepository implements PostLikeRepository {
 

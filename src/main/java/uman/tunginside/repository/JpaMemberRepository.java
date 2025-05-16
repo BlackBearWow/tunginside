@@ -10,7 +10,6 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-@Transactional
 public class JpaMemberRepository implements MemberRepository {
 
     private final EntityManager em;
@@ -41,7 +40,7 @@ public class JpaMemberRepository implements MemberRepository {
 
     @Override
     public void delete(Member member) {
-        em.remove(member);
+        em.remove(em.find(Member.class, member.getId()));
     }
 
     @Override

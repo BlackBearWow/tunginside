@@ -1,6 +1,7 @@
 package uman.tunginside.service;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uman.tunginside.domain.LoginForm;
@@ -14,6 +15,7 @@ import uman.tunginside.repository.MemberRepository;
 import java.time.LocalDateTime;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class MemberService {
 

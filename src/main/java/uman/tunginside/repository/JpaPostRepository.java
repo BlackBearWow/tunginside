@@ -16,7 +16,6 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-@Transactional
 public class JpaPostRepository implements PostRepository {
 
     private final EntityManager em;
