@@ -1,4 +1,4 @@
-package uman.tunginside.domain;
+package uman.tunginside.domain.post;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.validator.constraints.Length;
+import uman.tunginside.domain.category.Category;
+import uman.tunginside.domain.member.Member;
 
 import java.time.LocalDateTime;
 

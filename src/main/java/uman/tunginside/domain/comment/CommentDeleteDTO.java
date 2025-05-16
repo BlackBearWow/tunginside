@@ -1,4 +1,4 @@
-package uman.tunginside.domain;
+package uman.tunginside.domain.comment;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -6,12 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentUpdateDTO {
+public class CommentDeleteDTO {
     @NotNull
     private Long comment_id;
-    private String content;
     private String password;
 }

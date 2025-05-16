@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import uman.tunginside.exception.BadRequestException;
-import uman.tunginside.exception.DuplicateNicknameException;
-import uman.tunginside.exception.DuplicateUseridException;
-import uman.tunginside.exception.LoginFailException;
+import uman.tunginside.exception.NicknameException;
+import uman.tunginside.exception.UseridException;
+import uman.tunginside.exception.PasswordException;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
@@ -37,31 +37,31 @@ public class ExControllerAdvice {
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
     public Map<String, String> handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException ex) {
         Map<String, String> errors = new HashMap<>();
-        errors.put("message", ex.getMessage());
+        errors.put("sql integrity constraint violation", ex.getMessage());
         return errors;
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(DuplicateUseridException.class)
-    public Map<String, String> handleDuplicateUseridException(DuplicateUseridException ex) {
+    @ExceptionHandler(UseridException.class)
+    public Map<String, String> handleUseridException(UseridException ex) {
         Map<String, String> errors = new HashMap<>();
-        errors.put("message", ex.getMessage());
+        errors.put("userid", ex.getMessage());
         return errors;
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(DuplicateNicknameException.class)
-    public Map<String, String> handleDuplicateNicknameException(DuplicateNicknameException ex) {
+    @ExceptionHandler(NicknameException.class)
+    public Map<String, String> handleDuplicateNicknameException(NicknameException ex) {
         Map<String, String> errors = new HashMap<>();
-        errors.put("message", ex.getMessage());
+        errors.put("nickname", ex.getMessage());
         return errors;
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(LoginFailException.class)
-    public Map<String, String> handleLoginFailException(LoginFailException ex) {
+    @ExceptionHandler(PasswordException.class)
+    public Map<String, String> handlePasswordException(PasswordException ex) {
         Map<String, String> errors = new HashMap<>();
-        errors.put("message", ex.getMessage());
+        errors.put("password", ex.getMessage());
         return errors;
     }
 

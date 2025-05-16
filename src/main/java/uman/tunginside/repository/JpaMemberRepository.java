@@ -1,10 +1,9 @@
 package uman.tunginside.repository;
 
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import uman.tunginside.domain.Member;
+import uman.tunginside.domain.member.Member;
 
 import java.util.Optional;
 
@@ -20,14 +19,6 @@ public class JpaMemberRepository implements MemberRepository {
     }
 
     @Override
-    public void update(Long id, String userid, String password, String nickname) {
-        Member member = em.find(Member.class, id);
-        member.setUserid(userid);
-        member.setPassword(password);
-        member.setNickname(nickname);
-    }
-
-    @Override
     public Optional<Member> findById(long id) {
         return Optional.ofNullable(em.find(Member.class, id));
     }
@@ -39,8 +30,8 @@ public class JpaMemberRepository implements MemberRepository {
     }
 
     @Override
-    public void delete(Member member) {
-        em.remove(em.find(Member.class, member.getId()));
+    public void delete(Long member_id) {
+        em.remove(em.find(Member.class, member_id));
     }
 
     @Override

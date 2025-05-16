@@ -1,4 +1,4 @@
-package uman.tunginside.domain;
+package uman.tunginside.domain.post;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

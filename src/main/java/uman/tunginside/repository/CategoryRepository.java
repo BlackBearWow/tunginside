@@ -1,6 +1,6 @@
 package uman.tunginside.repository;
 
-import uman.tunginside.domain.Category;
+import uman.tunginside.domain.category.Category;
 
 import java.util.List;
 import java.util.Optional;

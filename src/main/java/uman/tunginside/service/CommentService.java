@@ -1,25 +1,31 @@
 package uman.tunginside.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uman.tunginside.domain.*;
+import org.springframework.transaction.annotation.Transactional;
+import uman.tunginside.domain.comment.*;
+import uman.tunginside.domain.member.Member;
+import uman.tunginside.domain.post.Post;
 import uman.tunginside.exception.BadRequestException;
 import uman.tunginside.repository.CommentRepository;
+import uman.tunginside.repository.MemberRepository;
 import uman.tunginside.repository.PostRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CommentService {
 
+    private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
 
-    public void writeComment(Long post_id, CommentWriteForm commentWriteForm, Member member, String ip_addr) {
+    @Transactional
+    public void writeComment(Long post_id, CommentWriteForm commentWriteForm, Long member_id, String ip_addr) {
+        Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("없는 멤버입니다"));
         Comment comment = new Comment();
         comment.setPost(postRepository.findById(post_id)
                 .orElseThrow(() -> new BadRequestException("없는 게시글입니다")));
@@ -50,20 +56,25 @@ public class CommentService {
         return commentRepository.findByPost(post);
     }
 
-    public void updateComment(CommentUpdateDTO commentUpdateDTO, Member member) {
+    @Transactional
+    public void updateComment(CommentUpdateDTO commentUpdateDTO, Long member_id) {
+        Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("없는 멤버입니다"));
         Comment comment = commentRepository.findById(commentUpdateDTO.getComment_id()).orElseThrow(() -> new BadRequestException("없는 댓글입니다"));
         // 1. 댓글의 member가 null이 아니고 세션이 있어야하고 세션과 동일인경우.
         // 2. 댓글의 비밀번호가 있고 보낸 비밀번호가 동일한 경우.
         if( (comment.getMember() != null && member != null && comment.getMember().getId().equals(member.getId()) ) ||
                 (comment.getPassword() != null && comment.getPassword().equals(commentUpdateDTO.getPassword())) ) {
-            commentRepository.update(commentUpdateDTO);
+            comment.setContent(commentUpdateDTO.getContent());
+            comment.setLast_modified_at(LocalDateTime.now());
         }
         else {
             throw new BadRequestException("자신이 쓴 댓글이 아니거나 비밀번호가 틀립니다");
         }
     }
 
-    public void deleteComment(CommentDeleteDTO commentDeleteDTO, Member member) {
+    @Transactional
+    public void deleteComment(CommentDeleteDTO commentDeleteDTO, Long member_id) {
+        Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("없는 멤버입니다"));
         Comment comment = commentRepository.findById(commentDeleteDTO.getComment_id()).orElseThrow(() -> new BadRequestException("없는 댓글입니다"));
         // 1. 댓글의 member가 null이 아니고 세션이 있어야하고 세션과 동일인경우.
         // 2. 댓글의 비밀번호가 있고 보낸 비밀번호가 동일한 경우.
@@ -71,7 +82,8 @@ public class CommentService {
                 (comment.getPassword() != null && comment.getPassword().equals(commentDeleteDTO.getPassword())) ) {
             // 대댓글이 있다면 삭제상태로 변경.
             if(commentRepository.findNestedCommentCount(comment) > 0) {
-                commentRepository.updateToDeleted(comment);
+                comment.setContent(" ");
+                comment.setDeleted(true);
             }
             // 없다면 삭제.
             else {

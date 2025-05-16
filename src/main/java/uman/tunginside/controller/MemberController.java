@@ -5,12 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import uman.tunginside.domain.LoginForm;
-import uman.tunginside.domain.Member;
-import uman.tunginside.domain.MemberSignupForm;
+import uman.tunginside.domain.member.LoginForm;
+import uman.tunginside.domain.member.Member;
+import uman.tunginside.domain.member.MemberSignupForm;
 import uman.tunginside.service.MemberService;
-
-import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,26 +28,37 @@ public class MemberController {
     @PostMapping("/login")
     public String login(@RequestBody @Validated LoginForm loginForm, HttpSession session) {
         // 로그인. id와 password 검사는 service 계층에서 한다.
-        Member result = memberService.login(loginForm);
+        Long result = memberService.login(loginForm);
         // 세션 정보 저장
-        session.setAttribute("member", result);
+        session.setAttribute("member_id", result);
         return "로그인 성공";
     }
 
     @GetMapping
-    public Member getMember(@SessionAttribute(name = "member") Member member) {
-        return member;
+    public Member getMemberInfo(@SessionAttribute Long member_id) {
+        return memberService.getMember(member_id);
+    }
+
+    @PostMapping("/logout")
+    public String logout(HttpSession session) {
+        session.removeAttribute("member_id");
+        return "로그아웃";
+    }
+
+    @GetMapping("/is-login")
+    public boolean isLogin(@SessionAttribute(required = false) Long member_id) {
+        return member_id != null;
     }
 
     @PutMapping
-    public String updateMember(@RequestBody @Validated MemberSignupForm memberSignupForm, @SessionAttribute(name = "member") Member member, HttpSession session) {
-        memberService.update(memberSignupForm, member, session);
+    public String updateMember(@RequestBody @Validated MemberSignupForm memberSignupForm, @SessionAttribute Long member_id, HttpSession session) {
+        memberService.update(memberSignupForm, member_id, session);
         return "업데이트 성공";
     }
 
     @DeleteMapping
-    public String deleteMember(@SessionAttribute(name = "member") Member member) {
-        memberService.delete(member);
+    public String deleteMember(@SessionAttribute Long member_id) {
+        memberService.delete(member_id);
         return "탈퇴 성공";
     }
 }

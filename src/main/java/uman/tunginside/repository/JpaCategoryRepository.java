@@ -1,10 +1,9 @@
 package uman.tunginside.repository;
 
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import uman.tunginside.domain.Category;
+import uman.tunginside.domain.category.Category;
 
 import java.util.List;
 import java.util.Optional;

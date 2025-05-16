@@ -1,42 +1,43 @@
 package uman.tunginside.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uman.tunginside.domain.*;
+import org.springframework.transaction.annotation.Transactional;
+import uman.tunginside.domain.member.Member;
+import uman.tunginside.domain.post.*;
 import uman.tunginside.exception.BadRequestException;
-import uman.tunginside.repository.CategoryRepository;
-import uman.tunginside.repository.PostDislikeRepository;
-import uman.tunginside.repository.PostLikeRepository;
-import uman.tunginside.repository.PostRepository;
+import uman.tunginside.repository.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PostService {
 
+    private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
     private final PostLikeRepository postLikeRepository;
     private final PostDislikeRepository postDislikeRepository;
 
-    public void writePost(PostWriteForm postWriteForm, Member member, String ip_addr) {
+    @Transactional
+    public void writePost(PostWriteForm postWriteForm, Long member_id, String ip_addr) {
+        Optional<Member> member = memberRepository.findById(member_id);
         Post post = new Post();
         post.setCategory(categoryRepository.findByAbbreviation(postWriteForm.getAbbr())
                 .orElseThrow(()->new BadRequestException("없는 카테고리입니다")));
         // 로그인이라면 멤버를 세팅하고 익명이라면 아이피와 비밀번호 넣는다.
-        if(member != null) {
-            post.setMember(member);
-        }
-        else {
+        if(member.isEmpty()) {
             post.setIp_addr(ip_addr);
             if(postWriteForm.getPassword() == null || postWriteForm.getPassword().isEmpty()) {
                 throw new BadRequestException("익명으로 게시글 작성시 비밀번호는 필수입니다");
             }
             post.setPassword(postWriteForm.getPassword());
+        }
+        else {
+            post.setMember(member.get());
         }
         post.setCreate_at(LocalDateTime.now());
         post.setTitle(postWriteForm.getTitle());
@@ -47,32 +48,45 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public List<PostSummaryDTO> getPostSummaryDTOs(PostGetForm postGetForm) {
-        return postRepository.findByConditions(postGetForm.getAbbr(), postGetForm.getPage(), postGetForm.getLike_cut(), postGetForm.getSearch());
+    public PostListDTO getPostList(PostGetForm postGetForm) {
+        PostListDTO postListDTO = new PostListDTO();
+        postListDTO.setTotalCount(postRepository.countByConditions(postGetForm.getAbbr(), postGetForm.getPage(), postGetForm.getLike_cut(), postGetForm.getSearch()));
+        postListDTO.setPosts(postRepository.findByConditions(postGetForm.getAbbr(), postGetForm.getPage(), postGetForm.getLike_cut(), postGetForm.getSearch()));
+        return postListDTO;
     }
 
-    public List<PostSummaryDTO> getBestPosts() {
-        return postRepository.findByLikeCut(3);
+    public PostListDTO getBestPosts() {
+        PostListDTO postListDTO = new PostListDTO();
+        postListDTO.setTotalCount(postRepository.countByLikeCut(3));
+        postListDTO.setPosts(postRepository.findByLikeCut(3));
+        return postListDTO;
     }
 
     public PostDetailDTO getPostDetail(Long postId) {
         return postRepository.findDetailById(postId).orElseThrow(() -> new BadRequestException("없는 게시글입니다"));
     }
 
-    public void updatePost(PostUpdateForm postUpdateForm, Long postId, Member member, String ip_addr) {
+    @Transactional
+    public void updatePost(PostUpdateForm postUpdateForm, Long postId, Long member_id, String ip_addr) {
+        Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("없는 멤버입니다"));
         Post post = postRepository.findById(postId).orElseThrow(() -> new BadRequestException("없는 게시글입니다"));
         // 1. 게시글의 member가 null이 아니고 세션이 있어야하고 세션과 동일인경우.
         // 2. 게시글의 비밀번호가 있고 보낸 비밀번호가 동일한 경우.
         if( (post.getMember() != null && member != null && post.getMember().getId().equals(member.getId()) ) ||
                 (post.getPassword() != null && post.getPassword().equals(postUpdateForm.getPassword())) ) {
-            postRepository.update(postUpdateForm, postId, ip_addr);
+            post.setTitle(postUpdateForm.getTitle());
+            post.setContent(postUpdateForm.getContent());
+            post.setLast_modified_ip(ip_addr);
+            post.setLast_modified_at(LocalDateTime.now());
         }
         else {
             throw new BadRequestException("자신이 쓴 게시글이 아니거나 비밀번호가 틀립니다");
         }
     }
 
-    public void deletePost(Long postId, String password, Member member) {
+    @Transactional
+    public void deletePost(Long postId, String password, Long member_id) {
+        Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("없는 멤버입니다"));
         Post post = postRepository.findById(postId).orElseThrow(() -> new BadRequestException("없는 게시글입니다"));
         // 1. 게시글의 member가 null이 아니고 세션이 있어야하고 세션과 동일인경우.
         // 2. 게시글의 비밀번호가 있고 보낸 비밀번호가 동일한 경우.
@@ -85,7 +99,9 @@ public class PostService {
         }
     }
 
-    public void postLike(Long post_id, Member member, String ip_addr) {
+    @Transactional
+    public void postLike(Long post_id, Long member_id, String ip_addr) {
+        Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("없는 멤버입니다"));
         Post post = postRepository.findById(post_id).orElseThrow(() -> new BadRequestException("게시글이 존재하지 않습니다"));
         PostLike postLike = new PostLike();
         if(member != null) {
@@ -102,10 +118,12 @@ public class PostService {
         postLike.setCreated_at(LocalDateTime.now());
         postLikeRepository.save(postLike);
         // 좋아요 개수 늘리기
-        postRepository.increaseLikeCount(post_id);
+        post.setPost_like_count(post.getPost_like_count() + 1);
     }
 
-    public void postDislike(Long post_id, Member member, String ip_addr) {
+    @Transactional
+    public void postDislike(Long post_id, Long member_id, String ip_addr) {
+        Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("없는 멤버입니다"));
         Post post = postRepository.findById(post_id).orElseThrow(() -> new BadRequestException("게시글이 존재하지 않습니다"));
         PostDislike postDislike = new PostDislike();
         if(member != null) {
@@ -122,6 +140,6 @@ public class PostService {
         postDislike.setCreated_at(LocalDateTime.now());
         postDislikeRepository.save(postDislike);
         // 싫어요 개수 늘리기
-        postRepository.increaseDislikeCount(post_id);
+        post.setPost_dislike_count(post.getPost_dislike_count() + 1);
     }
 }

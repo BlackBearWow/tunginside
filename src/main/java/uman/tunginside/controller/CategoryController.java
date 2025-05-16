@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import uman.tunginside.domain.Category;
-import uman.tunginside.domain.CategoryDeleteForm;
-import uman.tunginside.domain.CategoryRegisterForm;
-import uman.tunginside.domain.Member;
+import uman.tunginside.domain.category.Category;
+import uman.tunginside.domain.category.CategoryDeleteForm;
+import uman.tunginside.domain.category.CategoryRegisterForm;
+import uman.tunginside.domain.member.Member;
 import uman.tunginside.service.CategoryService;
 
 import java.util.List;
@@ -26,12 +26,12 @@ public class CategoryController {
     }
 
     @PostMapping
-    public String createCategory(@RequestBody @Validated CategoryRegisterForm categoryRegisterForm, @SessionAttribute("member") Member member) {
-        return categoryService.registerCategory(categoryRegisterForm, member);
+    public String createCategory(@RequestBody @Validated CategoryRegisterForm categoryRegisterForm, @SessionAttribute Long member_id) {
+        return categoryService.registerCategory(categoryRegisterForm, member_id);
     }
 
     @DeleteMapping
-    public String deleteCategory(@SessionAttribute("member") Member member, @RequestBody CategoryDeleteForm categoryDeleteForm) {
-        return categoryService.deleteCategory(member, categoryDeleteForm.getAbbreviation());
+    public String deleteCategory(@SessionAttribute Long member_id, @RequestBody CategoryDeleteForm categoryDeleteForm) {
+        return categoryService.deleteCategory(member_id, categoryDeleteForm.getAbbreviation());
     }
 }

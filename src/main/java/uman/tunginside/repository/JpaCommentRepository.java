@@ -1,15 +1,12 @@
 package uman.tunginside.repository;
 
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import uman.tunginside.domain.Comment;
-import uman.tunginside.domain.CommentDTO;
-import uman.tunginside.domain.CommentUpdateDTO;
-import uman.tunginside.domain.Post;
+import uman.tunginside.domain.comment.Comment;
+import uman.tunginside.domain.comment.CommentDTO;
+import uman.tunginside.domain.post.Post;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,20 +30,6 @@ public class JpaCommentRepository implements CommentRepository {
     @Override
     public void save(Comment comment) {
         em.persist(comment);
-    }
-
-    @Override
-    public void update(CommentUpdateDTO commentUpdateDTO) {
-        Comment comment = em.find(Comment.class, commentUpdateDTO.getComment_id());
-        comment.setContent(commentUpdateDTO.getContent());
-        comment.setLast_modified_at(LocalDateTime.now());
-    }
-
-    @Override
-    public void updateToDeleted(Comment comment) {
-        Comment result = em.find(Comment.class, comment.getId());
-        result.setContent(" ");
-        result.setDeleted(true);
     }
 
     @Override

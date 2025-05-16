@@ -1,11 +1,12 @@
-package uman.tunginside.domain;
+package uman.tunginside.domain.comment;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.validator.constraints.Length;
+import uman.tunginside.domain.member.Member;
+import uman.tunginside.domain.post.Post;
 
 import java.time.LocalDateTime;
 

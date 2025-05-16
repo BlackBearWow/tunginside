@@ -1,4 +1,4 @@
-package uman.tunginside.domain;
+package uman.tunginside.domain.member;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

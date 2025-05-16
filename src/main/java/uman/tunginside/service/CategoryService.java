@@ -1,28 +1,32 @@
 package uman.tunginside.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uman.tunginside.domain.Category;
-import uman.tunginside.domain.CategoryRegisterForm;
-import uman.tunginside.domain.Member;
+import org.springframework.transaction.annotation.Transactional;
+import uman.tunginside.domain.category.Category;
+import uman.tunginside.domain.category.CategoryRegisterForm;
+import uman.tunginside.domain.member.Member;
 import uman.tunginside.exception.BadRequestException;
 import uman.tunginside.repository.CategoryRepository;
+import uman.tunginside.repository.MemberRepository;
 
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final MemberRepository memberRepository;
 
     public List<Category> getCategories() {
         return categoryRepository.findAll();
     }
 
-    public String registerCategory(CategoryRegisterForm categoryRegisterForm, Member member) {
+    @Transactional
+    public String registerCategory(CategoryRegisterForm categoryRegisterForm, Long member_id) {
+        Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("없는 회원입니다"));
         // 중복 이름 검색
         if(categoryRepository.existByName(categoryRegisterForm.getName())) {
             throw new BadRequestException("이름이 이미 있습니다");
@@ -40,7 +44,9 @@ public class CategoryService {
         return "카테고리 등록 성공";
     }
 
-    public String deleteCategory(Member member, String abbreviation) {
+    @Transactional
+    public String deleteCategory(Long member_id, String abbreviation) {
+        Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("없는 회원입니다"));
         Category category = categoryRepository.findByAbbreviation(abbreviation)
                 .orElseThrow(() -> new BadRequestException("없는 카테코리입니다"));
         if (category.getMember().getId().equals(member.getId())) {

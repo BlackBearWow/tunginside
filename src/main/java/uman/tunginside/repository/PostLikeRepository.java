@@ -1,8 +1,8 @@
 package uman.tunginside.repository;
 
-import uman.tunginside.domain.Member;
-import uman.tunginside.domain.Post;
-import uman.tunginside.domain.PostLike;
+import uman.tunginside.domain.member.Member;
+import uman.tunginside.domain.post.Post;
+import uman.tunginside.domain.post.PostLike;
 
 import java.util.Optional;
 
