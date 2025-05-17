@@ -19,8 +19,11 @@ public class JpaMemberRepository implements MemberRepository {
     }
 
     @Override
-    public Optional<Member> findById(long id) {
-        return Optional.ofNullable(em.find(Member.class, id));
+    public Optional<Member> findById(Long id) {
+//        return Optional.ofNullable(em.find(Member.class, id));
+        return em.createQuery("select m from Member m where m.id = :id", Member.class)
+                .setParameter("id", id)
+                .getResultList().stream().findFirst();
     }
 
     @Override

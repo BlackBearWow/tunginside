@@ -25,7 +25,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public String registerCategory(CategoryRegisterForm categoryRegisterForm, Long member_id) {
+    public Long registerCategory(CategoryRegisterForm categoryRegisterForm, Long member_id) {
         Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("없는 회원입니다"));
         // 중복 이름 검색
         if(categoryRepository.existByName(categoryRegisterForm.getName())) {
@@ -37,21 +37,19 @@ public class CategoryService {
         }
         // 중복 검사 통과라면 저장
         Category category = new Category();
-        category.setMember(member);
-        category.setName(categoryRegisterForm.getName());
-        category.setAbbreviation(categoryRegisterForm.getAbbreviation());
+        category.registerCategory(categoryRegisterForm, member);
         categoryRepository.save(category);
-        return "카테고리 등록 성공";
+        return category.getId();
     }
 
     @Transactional
-    public String deleteCategory(Long member_id, String abbreviation) {
+    public void deleteCategory(Long member_id, String abbreviation) {
         Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("없는 회원입니다"));
         Category category = categoryRepository.findByAbbreviation(abbreviation)
                 .orElseThrow(() -> new BadRequestException("없는 카테코리입니다"));
         if (category.getMember().getId().equals(member.getId())) {
             categoryRepository.delete(category);
-            return "카테고리 삭제 성공";
+
         }
         else 
             throw new BadRequestException("권한이 없습니다");

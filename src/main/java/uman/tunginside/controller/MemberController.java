@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import uman.tunginside.domain.member.LoginForm;
-import uman.tunginside.domain.member.Member;
+import uman.tunginside.domain.member.MemberLoginForm;
+import uman.tunginside.domain.member.MemberResponseDTO;
 import uman.tunginside.domain.member.MemberSignupForm;
 import uman.tunginside.service.MemberService;
 
@@ -26,17 +26,17 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody @Validated LoginForm loginForm, HttpSession session) {
+    public String login(@RequestBody @Validated MemberLoginForm memberLoginForm, HttpSession session) {
         // 로그인. id와 password 검사는 service 계층에서 한다.
-        Long result = memberService.login(loginForm);
+        Long result = memberService.login(memberLoginForm);
         // 세션 정보 저장
         session.setAttribute("member_id", result);
         return "로그인 성공";
     }
 
     @GetMapping
-    public Member getMemberInfo(@SessionAttribute Long member_id) {
-        return memberService.getMember(member_id);
+    public MemberResponseDTO getMemberInfo(@SessionAttribute Long member_id) {
+        return memberService.getMember(member_id).toMemberResponseDTO();
     }
 
     @PostMapping("/logout")

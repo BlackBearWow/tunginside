@@ -8,7 +8,7 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 import uman.tunginside.domain.member.Member;
 
-@Getter @Setter
+@Getter
 @Entity
 @Table(
         name = "category",
@@ -28,4 +28,10 @@ public class Category {
     private String name;
     @NotNull @Length(max = 20)
     private String abbreviation;
+
+    public void registerCategory(CategoryRegisterForm categoryRegisterForm, Member member) {
+        this.member = member;
+        this.name = categoryRegisterForm.getName();
+        this.abbreviation = categoryRegisterForm.getAbbreviation();
+    }
 }

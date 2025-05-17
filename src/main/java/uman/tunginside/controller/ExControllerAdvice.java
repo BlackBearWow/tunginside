@@ -30,6 +30,8 @@ public class ExControllerAdvice {
             errors.put(error.getField(), error.getDefaultMessage());
         });
 
+        log.info("errors: {}", bindingResult.getFieldErrors());
+
         return errors;
     }
 

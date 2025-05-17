@@ -1,6 +1,7 @@
 package uman.tunginside.domain.member;
 
 import jakarta.persistence.*;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +9,7 @@ import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 
-@Getter @Setter
+@Getter
 @Entity
 @Table(
         name = "member",
@@ -28,4 +29,25 @@ public class Member {
     private String nickname;
     @NotNull
     private LocalDateTime create_at;
+
+    public MemberResponseDTO toMemberResponseDTO() {
+        return new MemberResponseDTO(this.userid, this.nickname, this.create_at);
+    }
+    public void setFromMemberSignupForm(MemberSignupForm memberSignupForm) {
+        this.userid = memberSignupForm.getUserid();
+        this.password = memberSignupForm.getPassword();
+        this.nickname = memberSignupForm.getNickname();
+        this.create_at = LocalDateTime.now();
+    }
+    public void update(MemberSignupForm memberSignupForm) {
+        if(memberSignupForm.getUserid() != null && !memberSignupForm.getUserid().isBlank()) {
+            this.userid = memberSignupForm.getUserid();
+        }
+        if(memberSignupForm.getPassword() != null && !memberSignupForm.getPassword().isBlank()) {
+            this.password = memberSignupForm.getPassword();
+        }
+        if(memberSignupForm.getNickname() != null && !memberSignupForm.getNickname().isBlank()) {
+            this.nickname = memberSignupForm.getNickname();
+        }
+    }
 }

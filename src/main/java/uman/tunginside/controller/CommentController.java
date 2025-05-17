@@ -8,7 +8,6 @@ import uman.tunginside.domain.comment.CommentDTO;
 import uman.tunginside.domain.comment.CommentDeleteDTO;
 import uman.tunginside.domain.comment.CommentUpdateDTO;
 import uman.tunginside.domain.comment.CommentWriteForm;
-import uman.tunginside.domain.member.Member;
 import uman.tunginside.service.CommentService;
 
 import java.util.List;

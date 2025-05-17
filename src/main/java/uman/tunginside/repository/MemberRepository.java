@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface MemberRepository {
     void save(Member member);
-    Optional<Member> findById(long id);
+    Optional<Member> findById(Long id);
     Optional<Member> findByUserid(String userid);
     void delete(Long member_id);
     boolean existsByUserid(String userid);

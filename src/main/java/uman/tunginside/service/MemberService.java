@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uman.tunginside.domain.member.LoginForm;
+import uman.tunginside.domain.member.MemberLoginForm;
 import uman.tunginside.domain.member.Member;
 import uman.tunginside.domain.member.MemberSignupForm;
 import uman.tunginside.exception.BadRequestException;
@@ -23,7 +23,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void signup(MemberSignupForm memberSignupForm) {
+    public Long signup(MemberSignupForm memberSignupForm) {
         // 중복 아이디 회원 검색
         if(memberRepository.existsByUserid(memberSignupForm.getUserid())) {
             throw new UseridException("이미 사용중인 아이디입니다");
@@ -34,17 +34,15 @@ public class MemberService {
         }
         // 중복이 없다면 세이브
         Member member = new Member();
-        member.setUserid(memberSignupForm.getUserid());
-        member.setPassword(memberSignupForm.getPassword());
-        member.setNickname(memberSignupForm.getNickname());
-        member.setCreate_at(LocalDateTime.now());
+        member.setFromMemberSignupForm(memberSignupForm);
         memberRepository.save(member);
+        return member.getId();
     }
 
-    public Long login(LoginForm loginForm) {
-        Member member = memberRepository.findByUserid(loginForm.getUserid())
+    public Long login(MemberLoginForm memberLoginForm) {
+        Member member = memberRepository.findByUserid(memberLoginForm.getUserid())
                 .orElseThrow(() -> new UseridException("존재하지 않는 멤버입니다."));
-        if (member.getPassword().equals(loginForm.getPassword())) {
+        if (member.getPassword().equals(memberLoginForm.getPassword())) {
             return member.getId();
         }
         else
@@ -71,9 +69,7 @@ public class MemberService {
             }
         }
         // 중복이 없다면 업데이트
-        member.setUserid(memberSignupForm.getUserid());
-        member.setPassword(memberSignupForm.getPassword());
-        member.setNickname(memberSignupForm.getNickname());
+        member.update(memberSignupForm);
     }
 
     @Transactional

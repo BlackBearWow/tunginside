@@ -27,11 +27,13 @@ public class CategoryController {
 
     @PostMapping
     public String createCategory(@RequestBody @Validated CategoryRegisterForm categoryRegisterForm, @SessionAttribute Long member_id) {
-        return categoryService.registerCategory(categoryRegisterForm, member_id);
+        categoryService.registerCategory(categoryRegisterForm, member_id);
+        return "카테고리 등록 성공";
     }
 
     @DeleteMapping
     public String deleteCategory(@SessionAttribute Long member_id, @RequestBody CategoryDeleteForm categoryDeleteForm) {
-        return categoryService.deleteCategory(member_id, categoryDeleteForm.getAbbreviation());
+        categoryService.deleteCategory(member_id, categoryDeleteForm.getAbbreviation());
+        return "카테고리 삭제 성공";
     }
 }

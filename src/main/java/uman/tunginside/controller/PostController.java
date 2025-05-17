@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import uman.tunginside.domain.member.Member;
 import uman.tunginside.domain.post.*;
 import uman.tunginside.service.PostService;
 
