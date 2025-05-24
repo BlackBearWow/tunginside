@@ -7,11 +7,11 @@ import uman.tunginside.domain.comment.*;
 import uman.tunginside.domain.member.Member;
 import uman.tunginside.domain.post.Post;
 import uman.tunginside.exception.BadRequestException;
+import uman.tunginside.repository.CommentQueryRepository;
 import uman.tunginside.repository.CommentRepository;
 import uman.tunginside.repository.MemberRepository;
 import uman.tunginside.repository.PostRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,12 +23,13 @@ public class CommentService {
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final CommentQueryRepository commentQueryRepository;
 
     @Transactional
     public Long writeComment(Long post_id, CommentWriteForm commentWriteForm, Long member_id, String ip_addr) {
         Post post = postRepository.findById(post_id)
                 .orElseThrow(() -> new BadRequestException("없는 게시글입니다"));
-        Optional<Member> optionalMember = memberRepository.findById(member_id);
+        Optional<Member> optionalMember = memberRepository.findByIdNullable(member_id);
         Comment prevComment = null;
         if(commentWriteForm.getPrev_comment_id() != null) {
             prevComment = commentRepository.findById(commentWriteForm.getPrev_comment_id())
@@ -40,21 +41,26 @@ public class CommentService {
         return comment.getId();
     }
 
-    public List<CommentDTO> getComments(Long post_id) {
+    public List<Comment> getComments(Long post_id) {
         Post post = postRepository.findById(post_id).orElseThrow(() -> new BadRequestException("없는 게시글입니다"));
         return commentRepository.findByPost(post);
     }
 
+    public List<CommentDTO> getCommentDTOs(Long post_id) {
+        Post post = postRepository.findById(post_id).orElseThrow(() -> new BadRequestException("없는 게시글입니다"));
+        return commentQueryRepository.findCommentDTOsByPost(post);
+    }
+
     @Transactional
     public void updateComment(CommentUpdateDTO commentUpdateDTO, Long member_id) {
-        Optional<Member> optionalMember = memberRepository.findById(member_id);
+        Optional<Member> optionalMember = memberRepository.findByIdNullable(member_id);
         Comment comment = commentRepository.findById(commentUpdateDTO.getComment_id()).orElseThrow(() -> new BadRequestException("없는 댓글입니다"));
         comment.update(commentUpdateDTO, optionalMember);
     }
 
     @Transactional
     public void deleteComment(CommentDeleteDTO commentDeleteDTO, Long member_id) {
-        Optional<Member> optionalMember = memberRepository.findById(member_id);
+        Optional<Member> optionalMember = memberRepository.findByIdNullable(member_id);
         Comment comment = commentRepository.findById(commentDeleteDTO.getComment_id()).orElseThrow(() -> new BadRequestException("없는 댓글입니다"));
         // 1. 댓글의 member가 null이 아니고 세션이 있어야하고 세션과 동일인경우.
         // 2. 댓글의 비밀번호가 있고 보낸 비밀번호가 동일한 경우.

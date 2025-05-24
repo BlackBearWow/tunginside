@@ -7,13 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import uman.tunginside.domain.member.MemberLoginForm;
 import uman.tunginside.domain.member.Member;
 import uman.tunginside.domain.member.MemberSignupForm;
-import uman.tunginside.exception.BadRequestException;
-import uman.tunginside.exception.NicknameException;
-import uman.tunginside.exception.UseridException;
-import uman.tunginside.exception.PasswordException;
+import uman.tunginside.domain.member.MemberUpdateForm;
+import uman.tunginside.exception.*;
 import uman.tunginside.repository.MemberRepository;
-
-import java.time.LocalDateTime;
 
 @Service
 @Transactional(readOnly = true)
@@ -54,27 +50,34 @@ public class MemberService {
     }
 
     @Transactional
-    public void update(MemberSignupForm memberSignupForm, Long member_id, HttpSession session) {
+    public void update(MemberUpdateForm muf, Long member_id, HttpSession session) {
         Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("없는 멤버입니다"));
-        // 중복 아이디 회원 검색. 자신의 아이디는 중복 검사하지 않는다.
-        if(!memberSignupForm.getUserid().equals(member.getUserid())) {
-            if(memberRepository.existsByUserid(memberSignupForm.getUserid())) {
+        // 현재 패스워드가 다르다면 에러
+        if(!member.getPassword().equals(muf.getPassword())) {
+            throw new PasswordException("비밀번호가 일치하지 않습니다");
+        }
+        // userid가 null이거나 빈칸이지 않고 자기자신의 아이디가 아니라면, 중복검사
+        if(muf.getUserid() != null && !muf.getUserid().isBlank() && !muf.getUserid().equals(member.getUserid())) {
+            if(memberRepository.existsByUserid(muf.getUserid())) {
                 throw new UseridException("이미 사용중인 아이디입니다");
             }
         }
-        // 중복 닉네임 회원 검색. 자신의 닉네임은 중복 검사하지 않는다.
-        if(!memberSignupForm.getNickname().equals(member.getNickname())) {
-            if(memberRepository.existsByNickname(memberSignupForm.getNickname())) {
+        // nickname이 null이거나 빈칸이지 않고 자기자신의 닉네임이 아니라면, 중복검사
+        if(muf.getNickname() != null && !muf.getNickname().isBlank() && !muf.getNickname().equals(member.getNickname())) {
+            if(memberRepository.existsByNickname(muf.getNickname())) {
                 throw new NicknameException("이미 사용중인 닉네임입니다");
             }
         }
+        // newPassword가 null이거나 빈칸이지 않고 패턴을 만족하지 않으면 에러
+        if(muf.getNewPassword() != null && !muf.getNewPassword().isBlank() && !muf.getNewPassword().matches("^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]{4,20}$")) {
+            throw new NewPasswordException("비밀번호는 영문, 숫자만 가능합니다. 영문, 숫자를 하나는 꼭 포함해야 합니다. 4~20자리여야 합니다");
+        }
         // 중복이 없다면 업데이트
-        member.update(memberSignupForm);
+        member.update(muf);
     }
 
     @Transactional
     public void delete(Long member_id) {
         memberRepository.delete(member_id);
     }
-
 }

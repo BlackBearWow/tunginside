@@ -4,10 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import uman.tunginside.domain.comment.CommentDTO;
-import uman.tunginside.domain.comment.CommentDeleteDTO;
-import uman.tunginside.domain.comment.CommentUpdateDTO;
-import uman.tunginside.domain.comment.CommentWriteForm;
+import uman.tunginside.domain.comment.*;
 import uman.tunginside.service.CommentService;
 
 import java.util.List;
@@ -27,7 +24,9 @@ public class CommentController {
 
     @GetMapping("/{post_id}")
     public List<CommentDTO> getComments(@PathVariable Long post_id) {
-        return commentService.getComments(post_id);
+//        return commentService.getCommentDTOs(post_id);
+        List<Comment> comments = commentService.getComments(post_id);
+        return comments.stream().map(CommentDTO::new).toList();
     }
 
     @PutMapping

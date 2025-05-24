@@ -8,10 +8,12 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.validator.constraints.Length;
 import uman.tunginside.domain.category.Category;
+import uman.tunginside.domain.comment.Comment;
 import uman.tunginside.domain.member.Member;
 import uman.tunginside.exception.BadRequestException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Getter
@@ -45,6 +47,8 @@ public class Post {
     private Integer post_dislike_count;
     @NotNull @ColumnDefault("0")
     private Integer comment_count;
+    @OneToMany(mappedBy = "post")
+    private List<Comment> commentList;
 
     public void writePost(PostWriteForm postWriteForm, Category category, Optional<Member> optionalMember, String ip_addr) {
         this.category = category;

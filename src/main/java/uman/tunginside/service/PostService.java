@@ -10,6 +10,7 @@ import uman.tunginside.exception.BadRequestException;
 import uman.tunginside.repository.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,13 +20,14 @@ public class PostService {
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final PostQueryRepository postQueryRepository;
     private final CategoryRepository categoryRepository;
     private final PostLikeRepository postLikeRepository;
     private final PostDislikeRepository postDislikeRepository;
 
     @Transactional
     public Long writePost(PostWriteForm postWriteForm, Long member_id, String ip_addr) {
-        Optional<Member> optionalMember = memberRepository.findById(member_id);
+        Optional<Member> optionalMember = memberRepository.findByIdNullable(member_id);
         Post post = new Post();
         Category category = categoryRepository.findByAbbreviation(postWriteForm.getAbbr())
                 .orElseThrow(() -> new BadRequestException("없는 카테고리입니다"));
@@ -45,7 +47,9 @@ public class PostService {
     public PostListDTO getBestPosts() {
         PostListDTO postListDTO = new PostListDTO();
         postListDTO.setTotalCount(postRepository.countByLikeCut(3));
-        postListDTO.setPosts(postRepository.findByLikeCut(3));
+//        postListDTO.setPosts(postQueryRepository.findPostSummaryDTOByLikeCut(3));
+        List<PostSummaryDTO> posts = postRepository.findByLikeCut(3).stream().map(PostSummaryDTO::new).toList();
+        postListDTO.setPosts(posts);
         return postListDTO;
     }
 
@@ -55,7 +59,7 @@ public class PostService {
 
     @Transactional
     public void updatePost(PostUpdateForm postUpdateForm, Long postId, Long member_id, String ip_addr) {
-        Optional<Member> optionalMember = memberRepository.findById(member_id);
+        Optional<Member> optionalMember = memberRepository.findByIdNullable(member_id);
         Post post = postRepository.findById(postId).orElseThrow(() -> new BadRequestException("없는 게시글입니다"));
         // 1. 게시글의 member가 null이 아니고 세션이 있어야하고 세션과 동일인경우.
         // 2. 게시글의 비밀번호가 있고 보낸 비밀번호가 동일한 경우.
@@ -64,7 +68,7 @@ public class PostService {
 
     @Transactional
     public void deletePost(Long postId, String password, Long member_id) {
-        Optional<Member> optionalMember = memberRepository.findById(member_id);
+        Optional<Member> optionalMember = memberRepository.findByIdNullable(member_id);
         Post post = postRepository.findById(postId).orElseThrow(() -> new BadRequestException("없는 게시글입니다"));
         // 1. 게시글의 member가 null이 아니고 세션이 있어야하고 세션과 동일인경우.
         // 2. 게시글의 비밀번호가 있고 보낸 비밀번호가 동일한 경우.
@@ -79,7 +83,7 @@ public class PostService {
 
     @Transactional
     public void postLike(Long post_id, Long member_id, String ip_addr) {
-        Optional<Member> optionalMember = memberRepository.findById(member_id);
+        Optional<Member> optionalMember = memberRepository.findByIdNullable(member_id);
         Post post = postRepository.findById(post_id).orElseThrow(() -> new BadRequestException("게시글이 존재하지 않습니다"));
         PostLike postLike = new PostLike();
         if(optionalMember.isPresent()) {
@@ -101,7 +105,7 @@ public class PostService {
 
     @Transactional
     public void postDislike(Long post_id, Long member_id, String ip_addr) {
-        Optional<Member> optionalMember = memberRepository.findById(member_id);
+        Optional<Member> optionalMember = memberRepository.findByIdNullable(member_id);
         Post post = postRepository.findById(post_id).orElseThrow(() -> new BadRequestException("게시글이 존재하지 않습니다"));
         PostDislike postDislike = new PostDislike();
         if(optionalMember.isPresent()) {

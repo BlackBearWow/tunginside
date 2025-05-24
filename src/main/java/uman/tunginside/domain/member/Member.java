@@ -6,8 +6,11 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
+import uman.tunginside.domain.category.Category;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -29,25 +32,24 @@ public class Member {
     private String nickname;
     @NotNull
     private LocalDateTime create_at;
+    @OneToMany(mappedBy = "member")
+    private List<Category> categoryList = new ArrayList<>();
 
-    public MemberResponseDTO toMemberResponseDTO() {
-        return new MemberResponseDTO(this.userid, this.nickname, this.create_at);
-    }
     public void setFromMemberSignupForm(MemberSignupForm memberSignupForm) {
         this.userid = memberSignupForm.getUserid();
         this.password = memberSignupForm.getPassword();
         this.nickname = memberSignupForm.getNickname();
         this.create_at = LocalDateTime.now();
     }
-    public void update(MemberSignupForm memberSignupForm) {
-        if(memberSignupForm.getUserid() != null && !memberSignupForm.getUserid().isBlank()) {
-            this.userid = memberSignupForm.getUserid();
+    public void update(MemberUpdateForm memberUpdateForm) {
+        if(memberUpdateForm.getUserid() != null && !memberUpdateForm.getUserid().isBlank()) {
+            this.userid = memberUpdateForm.getUserid();
         }
-        if(memberSignupForm.getPassword() != null && !memberSignupForm.getPassword().isBlank()) {
-            this.password = memberSignupForm.getPassword();
+        if(memberUpdateForm.getNewPassword() != null && !memberUpdateForm.getNewPassword().isBlank()) {
+            this.password = memberUpdateForm.getNewPassword();
         }
-        if(memberSignupForm.getNickname() != null && !memberSignupForm.getNickname().isBlank()) {
-            this.nickname = memberSignupForm.getNickname();
+        if(memberUpdateForm.getNickname() != null && !memberUpdateForm.getNickname().isBlank()) {
+            this.nickname = memberUpdateForm.getNickname();
         }
     }
 }

@@ -7,10 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import uman.tunginside.exception.BadRequestException;
-import uman.tunginside.exception.NicknameException;
-import uman.tunginside.exception.UseridException;
-import uman.tunginside.exception.PasswordException;
+import uman.tunginside.exception.*;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
@@ -64,6 +61,14 @@ public class ExControllerAdvice {
     public Map<String, String> handlePasswordException(PasswordException ex) {
         Map<String, String> errors = new HashMap<>();
         errors.put("password", ex.getMessage());
+        return errors;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(NewPasswordException.class)
+    public Map<String, String> handleNewPasswordException(NewPasswordException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("newPassword", ex.getMessage());
         return errors;
     }
 
