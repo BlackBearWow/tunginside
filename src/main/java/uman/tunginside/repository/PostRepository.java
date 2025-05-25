@@ -1,19 +1,28 @@
 package uman.tunginside.repository;
 
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import uman.tunginside.domain.category.QCategory;
 import uman.tunginside.domain.post.*;
+import uman.tunginside.domain.post.QPost;
 
 import java.util.List;
 import java.util.Optional;
+
+import static uman.tunginside.domain.category.QCategory.*;
+import static uman.tunginside.domain.post.QPost.*;
 
 @Repository
 @RequiredArgsConstructor
 public class PostRepository {
 
     private final EntityManager em;
+    private final JPAQueryFactory queryFactory;
 
     public void save(Post post) {
         em.persist(post);
@@ -28,60 +37,32 @@ public class PostRepository {
         return Optional.ofNullable(em.find(Post.class, id));
     }
 
-    public Optional<Post> findByAbbreviation(String abbreviation) {
-        return em.createQuery("select p from Post p join p.category c on c.abbreviation =: abbreviation", Post.class)
-                .setParameter("abbreviation", abbreviation).getResultList().stream().findFirst();
+    public List<Post> findByCondition(String abbr, Integer page, Integer likeCut, String search) {
+        return queryFactory.selectFrom(post)
+                .innerJoin(post.category, category)
+                .where(abbrEq(abbr), likeCutGoe(likeCut), searchLike(search))
+                .offset((page - 1) * 20)
+                .limit(20)
+                .fetch();
     }
 
-    // querydsl로 짜면 좋지않을까나
-    public List<PostSummaryDTO> findByConditions(String abbr, Integer page, Integer likeCut, String search) {
-        String jpql = "select p.id, c.name, m.nickname, p.title, p.ip_addr, p.create_at, p.last_modified_at, p.post_like_count, p.comment_count from Post p join p.category c on c.abbreviation =: abbreviation left join p.member m";
-        if (likeCut != null && search != null) {
-            jpql = jpql + " where p.post_like_count >= " + likeCut + " and (p.title like :search or p.content like :search)";
-        }
-        else if (likeCut != null) {
-            jpql = jpql + " where p.post_like_count >= " + likeCut;
-        }
-        else if (search != null) {
-            jpql = jpql + " where (p.title like :search or p.content like :search)";
-        }
-        TypedQuery<PostSummaryDTO> result = em.createQuery(jpql, PostSummaryDTO.class).setParameter("abbreviation", abbr);
-        if (search != null) {
-            result = result.setParameter("search", "%" + search + "%");
-        }
-        return result.setFirstResult((page - 1) * 20).setMaxResults(20).getResultList();
+    public Long countByCondition(String abbr, Integer likeCut, String search) {
+        return queryFactory.select(post.count())
+                .from(post)
+                .innerJoin(post.category, category)
+                .where(abbrEq(abbr), likeCutGoe(likeCut), searchLike(search))
+                .fetchOne();
     }
 
-    public Long countByConditions(String abbr, Integer page, Integer likeCut, String search) {
-        String jpql = "select count(p) from Post p join p.category c on c.abbreviation =: abbreviation left join p.member m";
-        if (likeCut != null && search != null) {
-            jpql = jpql + " where p.post_like_count >= " + likeCut + " and (p.title like :search or p.content like :search)";
-        }
-        else if (likeCut != null) {
-            jpql = jpql + " where p.post_like_count >= " + likeCut;
-        }
-        else if (search != null) {
-            jpql = jpql + " where (p.title like :search or p.content like :search)";
-        }
-        TypedQuery<Long> result = em.createQuery(jpql, Long.class).setParameter("abbreviation", abbr);
-        if (search != null) {
-            result = result.setParameter("search", "%" + search + "%");
-        }
-        return result.getSingleResult();
+    private BooleanExpression searchLike(String search) {
+        return search == null ? null : post.title.contains(search).or(post.content.contains(search));
     }
 
-    public List<Post> findByLikeCut(Integer likeCut) {
-        return em.createQuery("select p from Post p join fetch p.category c left join fetch p.member m where p.post_like_count >= :likeCut", Post.class)
-                .setParameter("likeCut", likeCut).getResultList();
+    private BooleanExpression likeCutGoe(Integer likeCut) {
+        return likeCut == null ? null : post.post_like_count.goe(likeCut);
     }
 
-    public Long countByLikeCut(Integer likeCut) {
-        return em.createQuery("select count(p) from Post p join p.category c left join p.member m where p.post_like_count >= :likeCut", Long.class)
-                .setParameter("likeCut", likeCut).getSingleResult();
-    }
-
-    public Optional<PostDetailDTO> findDetailById(Long postId) {
-        return em.createQuery("select p.id, c.name, c.abbreviation, m.nickname, p.ip_addr, p.last_modified_ip, p.create_at, p.last_modified_at, p.title, p.content, p.post_like_count, p.post_dislike_count, p.comment_count from Post p join p.category c on p.id = :postId left join p.member m", PostDetailDTO.class)
-                .setParameter("postId", postId).getResultList().stream().findFirst();
+    private BooleanExpression abbrEq(String abbr) {
+        return abbr == null ? null : category.abbr.eq(abbr);
     }
 }

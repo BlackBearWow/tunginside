@@ -38,6 +38,7 @@ public class CommentService {
         Comment comment = new Comment();
         comment.writeComment(commentWriteForm, post, optionalMember, prevComment, ip_addr);
         commentRepository.save(comment);
+        post.increaseCommentCount();
         return comment.getId();
     }
 
@@ -62,6 +63,7 @@ public class CommentService {
     public void deleteComment(CommentDeleteDTO commentDeleteDTO, Long member_id) {
         Optional<Member> optionalMember = memberRepository.findByIdNullable(member_id);
         Comment comment = commentRepository.findById(commentDeleteDTO.getComment_id()).orElseThrow(() -> new BadRequestException("없는 댓글입니다"));
+        Post post = comment.getPost();
         // 1. 댓글의 member가 null이 아니고 세션이 있어야하고 세션과 동일인경우.
         // 2. 댓글의 비밀번호가 있고 보낸 비밀번호가 동일한 경우.
         if( (comment.getMember() != null && optionalMember.isPresent() && comment.getMember().getId().equals(optionalMember.get().getId()) ) ||
@@ -79,6 +81,7 @@ public class CommentService {
                     commentRepository.delete(prevComment);
                 }
             }
+            post.decreaseCommentCount();
         }
         else {
             throw new BadRequestException("자신이 쓴 댓글이 아니거나 비밀번호가 틀립니다");

@@ -12,7 +12,7 @@ import uman.tunginside.service.CommentService;
 import uman.tunginside.service.MemberService;
 import uman.tunginside.service.PostService;
 
-//@Component
+@Component
 @RequiredArgsConstructor
 public class InitData {
 

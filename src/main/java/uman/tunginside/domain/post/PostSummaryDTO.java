@@ -24,7 +24,9 @@ public class PostSummaryDTO {
     public PostSummaryDTO(Post post) {
         this.id = post.getId();
         this.category_name = post.getCategory().getName();
-        this.nickname = post.getMember().getNickname();
+        if(post.getMember() != null) {
+            this.nickname = post.getMember().getNickname();
+        }
         this.title = post.getTitle();
         this.ip_addr = post.getIp_addr();
         this.create_at = post.getCreate_at();

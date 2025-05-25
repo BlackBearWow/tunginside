@@ -26,9 +26,9 @@ public class CategoryRepository {
         return Optional.ofNullable(em.find(Category.class, id));
     }
 
-    public Optional<Category> findByAbbreviation(String abbreviation) {
-        return em.createQuery("select c from Category c where c.abbreviation = :abbreviation", Category.class)
-                .setParameter("abbreviation", abbreviation).getResultList().stream().findFirst();
+    public Optional<Category> findByAbbr(String abbr) {
+        return em.createQuery("select c from Category c where c.abbr = :abbr", Category.class)
+                .setParameter("abbr", abbr).getResultList().stream().findFirst();
     }
 
     public boolean existByName(String name) {
@@ -37,9 +37,9 @@ public class CategoryRepository {
         return (count > 0);
     }
 
-    public boolean existsByAbbreviation(String abbreviation) {
-        Long count = em.createQuery("select count(c) from Category c where c.abbreviation = :abbreviation", Long.class)
-                .setParameter("abbreviation", abbreviation).getSingleResult();
+    public boolean existsByAbbr(String abbr) {
+        Long count = em.createQuery("select count(c) from Category c where c.abbr = :abbr", Long.class)
+                .setParameter("abbr", abbr).getSingleResult();
         return (count > 0);
     }
 

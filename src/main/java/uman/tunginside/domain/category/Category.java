@@ -14,7 +14,7 @@ import uman.tunginside.domain.member.Member;
         name = "category",
         uniqueConstraints = {
         @UniqueConstraint(columnNames = {"name"}),
-        @UniqueConstraint(columnNames = {"abbreviation"})
+        @UniqueConstraint(columnNames = {"abbr"})
 })
 public class Category {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,11 +27,11 @@ public class Category {
     @NotNull @Length(max = 60)
     private String name;
     @NotNull @Length(max = 20)
-    private String abbreviation;
+    private String abbr;
 
     public void registerCategory(CategoryRegisterForm categoryRegisterForm, Member member) {
         this.member = member;
         this.name = categoryRegisterForm.getName();
-        this.abbreviation = categoryRegisterForm.getAbbreviation();
+        this.abbr = categoryRegisterForm.getAbbr();
     }
 }

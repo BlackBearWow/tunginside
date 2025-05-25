@@ -32,7 +32,7 @@ public class CategoryService {
             throw new BadRequestException("이름이 이미 있습니다");
         }
         // 중복 줄임말 검색
-        if(categoryRepository.existsByAbbreviation(categoryRegisterForm.getAbbreviation())) {
+        if(categoryRepository.existsByAbbr(categoryRegisterForm.getAbbr())) {
             throw new BadRequestException("줄임말이 이미 있습니다");
         }
         // 중복 검사 통과라면 저장
@@ -45,7 +45,7 @@ public class CategoryService {
     @Transactional
     public void deleteCategory(Long member_id, String abbreviation) {
         Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("없는 회원입니다"));
-        Category category = categoryRepository.findByAbbreviation(abbreviation)
+        Category category = categoryRepository.findByAbbr(abbreviation)
                 .orElseThrow(() -> new BadRequestException("없는 카테코리입니다"));
         if (category.getMember().getId().equals(member.getId())) {
             categoryRepository.delete(category);

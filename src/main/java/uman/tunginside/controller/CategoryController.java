@@ -33,7 +33,7 @@ public class CategoryController {
 
     @DeleteMapping
     public String deleteCategory(@SessionAttribute Long member_id, @RequestBody CategoryDeleteForm categoryDeleteForm) {
-        categoryService.deleteCategory(member_id, categoryDeleteForm.getAbbreviation());
+        categoryService.deleteCategory(member_id, categoryDeleteForm.getAbbr());
         return "카테고리 삭제 성공";
     }
 }

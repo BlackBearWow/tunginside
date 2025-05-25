@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import uman.tunginside.domain.member.Member;
 import uman.tunginside.domain.member.MemberSignupForm;
 
@@ -14,7 +15,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
 //@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ComponentScan(basePackages = "uman.tunginside.repository")
+@Import(MemberRepository.class)
 class MemberRepositoryTest {
 
     @Autowired private MemberRepository memberRepository;

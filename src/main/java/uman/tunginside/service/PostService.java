@@ -29,7 +29,7 @@ public class PostService {
     public Long writePost(PostWriteForm postWriteForm, Long member_id, String ip_addr) {
         Optional<Member> optionalMember = memberRepository.findByIdNullable(member_id);
         Post post = new Post();
-        Category category = categoryRepository.findByAbbreviation(postWriteForm.getAbbr())
+        Category category = categoryRepository.findByAbbr(postWriteForm.getAbbr())
                 .orElseThrow(() -> new BadRequestException("없는 카테고리입니다"));
         // 로그인이라면 멤버를 세팅하고 익명이라면 아이피와 비밀번호 넣는다.
         post.writePost(postWriteForm, category, optionalMember, ip_addr);
@@ -37,24 +37,17 @@ public class PostService {
         return post.getId();
     }
 
-    public PostListDTO getPostList(PostGetForm postGetForm) {
+    public PostListDTO getPostListDTOByConditions(PostGetForm postGetForm) {
         PostListDTO postListDTO = new PostListDTO();
-        postListDTO.setTotalCount(postRepository.countByConditions(postGetForm.getAbbr(), postGetForm.getPage(), postGetForm.getLike_cut(), postGetForm.getSearch()));
-        postListDTO.setPosts(postRepository.findByConditions(postGetForm.getAbbr(), postGetForm.getPage(), postGetForm.getLike_cut(), postGetForm.getSearch()));
-        return postListDTO;
-    }
-
-    public PostListDTO getBestPosts() {
-        PostListDTO postListDTO = new PostListDTO();
-        postListDTO.setTotalCount(postRepository.countByLikeCut(3));
-//        postListDTO.setPosts(postQueryRepository.findPostSummaryDTOByLikeCut(3));
-        List<PostSummaryDTO> posts = postRepository.findByLikeCut(3).stream().map(PostSummaryDTO::new).toList();
-        postListDTO.setPosts(posts);
+        postListDTO.setTotalCount(postRepository.countByCondition(postGetForm.getAbbr(), postGetForm.getPage(), postGetForm.getSearch()));
+//        List<Post> posts = postRepository.findByCondition(postGetForm.getAbbr(), postGetForm.getPage(), postGetForm.getLike_cut(), postGetForm.getSearch());
+//        postListDTO.setPosts(posts.stream().map(PostSummaryDTO::new).toList());
+        postListDTO.setPosts(postQueryRepository.findByCondition(postGetForm.getAbbr(), postGetForm.getPage(), postGetForm.getLike_cut(), postGetForm.getSearch()));
         return postListDTO;
     }
 
     public PostDetailDTO getPostDetail(Long postId) {
-        return postRepository.findDetailById(postId).orElseThrow(() -> new BadRequestException("없는 게시글입니다"));
+        return postQueryRepository.findDetailById(postId).orElseThrow(() -> new BadRequestException("없는 게시글입니다"));
     }
 
     @Transactional

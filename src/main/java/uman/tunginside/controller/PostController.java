@@ -21,13 +21,8 @@ public class PostController {
     }
 
     @GetMapping
-    public PostListDTO getPostListDTOsByConditions(@RequestBody @Validated PostGetForm postGetForm) {
-        return postService.getPostList(postGetForm);
-    }
-
-    @GetMapping("/best")
-    public PostListDTO getBestPosts() {
-        return postService.getBestPosts();
+    public PostListDTO getPostListDTOByConditions(@Validated PostGetForm postGetForm) {
+        return postService.getPostListDTOByConditions(postGetForm);
     }
 
     @GetMapping("/{post_id}")

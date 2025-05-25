@@ -93,4 +93,12 @@ public class Post {
     public void increasePostDislikeCount() {
         this.post_dislike_count++;
     }
+
+    public void increaseCommentCount() {
+        this.comment_count++;
+    }
+
+    public void decreaseCommentCount() {
+        this.comment_count--;
+    }
 }
