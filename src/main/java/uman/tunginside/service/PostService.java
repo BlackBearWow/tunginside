@@ -39,7 +39,7 @@ public class PostService {
 
     public PostListDTO getPostListDTOByConditions(PostGetForm postGetForm) {
         PostListDTO postListDTO = new PostListDTO();
-        postListDTO.setTotalCount(postRepository.countByCondition(postGetForm.getAbbr(), postGetForm.getPage(), postGetForm.getSearch()));
+        postListDTO.setTotalCount(postRepository.countByCondition(postGetForm.getAbbr(), postGetForm.getLike_cut(), postGetForm.getSearch()));
 //        List<Post> posts = postRepository.findByCondition(postGetForm.getAbbr(), postGetForm.getPage(), postGetForm.getLike_cut(), postGetForm.getSearch());
 //        postListDTO.setPosts(posts.stream().map(PostSummaryDTO::new).toList());
         postListDTO.setPosts(postQueryRepository.findByCondition(postGetForm.getAbbr(), postGetForm.getPage(), postGetForm.getLike_cut(), postGetForm.getSearch()));

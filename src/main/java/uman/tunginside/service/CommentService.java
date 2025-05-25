@@ -34,6 +34,9 @@ public class CommentService {
         if(commentWriteForm.getPrev_comment_id() != null) {
             prevComment = commentRepository.findById(commentWriteForm.getPrev_comment_id())
                     .orElseThrow(() -> new BadRequestException("이전 댓글을 찾을 수 없습니다"));
+            if(!prevComment.getPost().getId().equals(post.getId())) {
+                throw new BadRequestException("같은 게시글의 댓글에만 대댓글을 달 수 있습니다");
+            }
         }
         Comment comment = new Comment();
         comment.writeComment(commentWriteForm, post, optionalMember, prevComment, ip_addr);
