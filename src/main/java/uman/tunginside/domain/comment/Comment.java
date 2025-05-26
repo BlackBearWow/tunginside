@@ -3,6 +3,8 @@ package uman.tunginside.domain.comment;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.validator.constraints.Length;
 import uman.tunginside.domain.member.Member;
 import uman.tunginside.domain.post.Post;
@@ -20,6 +22,7 @@ public class Comment {
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Post post;
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
@@ -35,6 +38,7 @@ public class Comment {
     @NotNull
     private Boolean deleted;
     @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Comment prev_comment;
 
     public void writeComment(CommentWriteForm commentWriteForm, Post post, Optional<Member> optionalMember, Comment prevComment, String ip_addr) {

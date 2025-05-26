@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.validator.constraints.Length;
 import uman.tunginside.domain.member.Member;
 
@@ -20,9 +22,9 @@ public class Category {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_id")
     private Long id;
-    @NotNull
+    @NotNull @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
     @NotNull @Length(max = 60)
     private String name;
