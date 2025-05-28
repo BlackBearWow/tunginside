@@ -51,8 +51,8 @@ public class Post {
     private Integer post_dislike_count;
     @NotNull @ColumnDefault("0")
     private Integer comment_count;
-//    @OneToMany(mappedBy = "post")
-//    private List<Comment> commentList;
+    @NotNull @ColumnDefault("0")
+    private Integer view_count;
 
     public void writePost(PostWriteForm postWriteForm, Category category, Optional<Member> optionalMember, String ip_addr) {
         this.category = category;
@@ -73,6 +73,7 @@ public class Post {
         this.post_like_count = 0;
         this.post_dislike_count = 0;
         this.comment_count = 0;
+        this.view_count = 0;
     }
 
     public void updatePost(PostUpdateForm postUpdateForm, Optional<Member> optionalMember, String ip_addr) {
@@ -104,5 +105,9 @@ public class Post {
 
     public void decreaseCommentCount() {
         this.comment_count--;
+    }
+
+    public void increaseViewCount() {
+        this.view_count++;
     }
 }

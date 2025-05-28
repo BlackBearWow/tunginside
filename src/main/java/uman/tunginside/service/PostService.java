@@ -42,11 +42,15 @@ public class PostService {
         postListDTO.setTotalCount(postRepository.countByCondition(postGetForm.getAbbr(), postGetForm.getLike_cut(), postGetForm.getSearch()));
 //        List<Post> posts = postRepository.findByCondition(postGetForm.getAbbr(), postGetForm.getPage(), postGetForm.getLike_cut(), postGetForm.getSearch());
 //        postListDTO.setPosts(posts.stream().map(PostSummaryDTO::new).toList());
-        postListDTO.setPosts(postQueryRepository.findByCondition(postGetForm.getAbbr(), postGetForm.getPage(), postGetForm.getLike_cut(), postGetForm.getSearch()));
+        postListDTO.setPosts(postQueryRepository.findByCondition(postGetForm.getAbbr(), postGetForm.getPage(),
+                postGetForm.getLike_cut(), postGetForm.getSearch(), postGetForm.getSize(), postGetForm.getOrderby()));
         return postListDTO;
     }
 
+    @Transactional
     public PostDetailDTO getPostDetail(Long postId) {
+        // 조회수를 늘린다.
+        postRepository.findById(postId).ifPresent(Post::increaseViewCount);
         return postQueryRepository.findDetailById(postId).orElseThrow(() -> new BadRequestException("없는 게시글입니다"));
     }
 

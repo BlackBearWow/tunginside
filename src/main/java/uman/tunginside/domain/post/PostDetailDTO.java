@@ -24,4 +24,5 @@ public class PostDetailDTO {
     private Integer post_like_count;
     private Integer post_dislike_count;
     private Integer comment_count;
+    private Integer view_count;
 }

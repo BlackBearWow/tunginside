@@ -20,6 +20,7 @@ public class PostSummaryDTO {
     private LocalDateTime last_modified_at;
     private Integer post_like_count;
     private Integer comment_count;
+    private Integer view_count;
 
     public PostSummaryDTO(Post post) {
         this.id = post.getId();
@@ -33,5 +34,6 @@ public class PostSummaryDTO {
         this.last_modified_at = post.getLast_modified_at();
         this.post_like_count = post.getPost_like_count();
         this.comment_count = post.getComment_count();
+        this.view_count = post.getView_count();
     }
 }

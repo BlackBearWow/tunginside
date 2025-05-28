@@ -1,5 +1,7 @@
 package uman.tunginside.domain.post;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,4 +15,7 @@ public class PostGetForm {
     private Integer page;
     private Integer like_cut;
     private String search;
+    private Integer size = 20;
+    @Enumerated(EnumType.STRING)
+    private PostOrderby orderby;
 }
