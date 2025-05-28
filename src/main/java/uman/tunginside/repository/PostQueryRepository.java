@@ -38,6 +38,7 @@ public class PostQueryRepository {
                 case PostOrderby.LIKE -> query.orderBy(post.post_like_count.desc(), post.create_at.desc());
                 case PostOrderby.DISLIKE -> query.orderBy(post.post_dislike_count.desc(), post.create_at.desc());
                 case PostOrderby.VIEWCOUNT -> query.orderBy(post.view_count.desc(), post.create_at.desc());
+                default -> query.orderBy(post.create_at.desc());
             };
         }
         return query.offset((page - 1) * size)
