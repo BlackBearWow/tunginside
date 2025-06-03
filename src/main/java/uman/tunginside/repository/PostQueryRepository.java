@@ -28,7 +28,7 @@ public class PostQueryRepository {
     private final JPAQueryFactory queryFactory;
 
     public List<PostSummaryDTO> findByCondition(String abbr, Integer page, Integer likeCut, String search, Integer size, PostOrderby orderby) {
-        JPAQuery<PostSummaryDTO> query = queryFactory.select(Projections.constructor(PostSummaryDTO.class, post.id, category.name, member.nickname, post.title, post.ip_addr, post.create_at, post.last_modified_at, post.post_like_count, post.comment_count, post.view_count))
+        JPAQuery<PostSummaryDTO> query = queryFactory.select(Projections.constructor(PostSummaryDTO.class, post.id, category.abbr, member.nickname, post.title, post.ip_addr, post.create_at, post.last_modified_at, post.post_like_count, post.comment_count, post.view_count))
                 .from(post)
                 .innerJoin(post.category, category)
                 .leftJoin(post.member, member)
@@ -38,8 +38,10 @@ public class PostQueryRepository {
                 case PostOrderby.LIKE -> query.orderBy(post.post_like_count.desc(), post.create_at.desc());
                 case PostOrderby.DISLIKE -> query.orderBy(post.post_dislike_count.desc(), post.create_at.desc());
                 case PostOrderby.VIEWCOUNT -> query.orderBy(post.view_count.desc(), post.create_at.desc());
-                default -> query.orderBy(post.create_at.desc());
             };
+        }
+        else {
+            query = query.orderBy(post.create_at.desc());
         }
         return query.offset((page - 1) * size)
                 .limit(size)

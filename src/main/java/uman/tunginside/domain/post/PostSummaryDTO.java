@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PostSummaryDTO {
     private Long id;
-    private String category_name;
+    private String abbr;
     private String nickname;
     private String title;
     private String ip_addr;
@@ -24,7 +24,7 @@ public class PostSummaryDTO {
 
     public PostSummaryDTO(Post post) {
         this.id = post.getId();
-        this.category_name = post.getCategory().getName();
+        this.abbr = post.getCategory().getAbbr();
         if(post.getMember() != null) {
             this.nickname = post.getMember().getNickname();
         }
