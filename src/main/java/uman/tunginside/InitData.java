@@ -2,6 +2,7 @@ package uman.tunginside;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import uman.tunginside.domain.category.CategoryRegisterForm;
 import uman.tunginside.domain.comment.CommentWriteForm;
@@ -13,6 +14,7 @@ import uman.tunginside.service.MemberService;
 import uman.tunginside.service.PostService;
 
 @Component
+@Profile("!test")
 @RequiredArgsConstructor
 public class InitData {
 

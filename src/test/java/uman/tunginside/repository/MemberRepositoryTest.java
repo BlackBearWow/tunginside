@@ -4,9 +4,7 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import uman.tunginside.domain.member.Member;
 import uman.tunginside.domain.member.MemberSignupForm;
@@ -21,12 +19,25 @@ class MemberRepositoryTest {
     @Autowired private MemberRepository memberRepository;
 
     @Test
-    public void unique() {
+    public void 멤버는아이디가중복될수없다() {
         // given
         Member member = new Member();
-        member.setFromMemberSignupForm(new MemberSignupForm("user1", "pass1", "user1"));
+        member.setFromMemberSignupForm(new MemberSignupForm("user", "pass1", "user1"));
         Member member1 = new Member();
-        member1.setFromMemberSignupForm(new MemberSignupForm("user1", "pass1", "user1"));
+        member1.setFromMemberSignupForm(new MemberSignupForm("user", "pass1", "user2"));
+        // when
+        memberRepository.save(member);
+        // then
+        Assertions.assertThrows(ConstraintViolationException.class, () -> memberRepository.save(member1));
+    }
+
+    @Test
+    public void 멤버는닉네임이중복될수없다() {
+        // given
+        Member member = new Member();
+        member.setFromMemberSignupForm(new MemberSignupForm("user1", "pass1", "user"));
+        Member member1 = new Member();
+        member1.setFromMemberSignupForm(new MemberSignupForm("user2", "pass1", "user"));
         // when
         memberRepository.save(member);
         // then

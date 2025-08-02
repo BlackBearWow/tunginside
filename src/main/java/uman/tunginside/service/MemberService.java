@@ -78,6 +78,7 @@ public class MemberService {
 
     @Transactional
     public void delete(Long member_id) {
-        memberRepository.delete(member_id);
+        Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("멤버가 없습니다"));
+        memberRepository.delete(member);
     }
 }

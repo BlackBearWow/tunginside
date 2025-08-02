@@ -4,18 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.validator.constraints.Length;
 import uman.tunginside.domain.category.Category;
-import uman.tunginside.domain.comment.Comment;
 import uman.tunginside.domain.member.Member;
 import uman.tunginside.exception.BadRequestException;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Getter
@@ -33,8 +30,9 @@ public class Post {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
+    @Column(name = "ip_addr")
     @Length(max = 15)
-    private String ip_addr;
+    private String ipAddr;
     @Length(max = 15)
     private String last_modified_ip;
     private String password;
@@ -61,7 +59,7 @@ public class Post {
             if(postWriteForm.getPassword() == null || postWriteForm.getPassword().isBlank()) {
                 throw new BadRequestException("익명으로 게시글 작성시 비밀번호는 필수입니다");
             }
-            this.ip_addr = ip_addr;
+            this.ipAddr = ip_addr;
             this.password = postWriteForm.getPassword();
         }
         else {

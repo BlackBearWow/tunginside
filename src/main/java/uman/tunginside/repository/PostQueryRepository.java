@@ -28,7 +28,7 @@ public class PostQueryRepository {
     private final JPAQueryFactory queryFactory;
 
     public List<PostSummaryDTO> findByCondition(String abbr, Integer page, Integer likeCut, String search, Integer size, PostOrderby orderby) {
-        JPAQuery<PostSummaryDTO> query = queryFactory.select(Projections.constructor(PostSummaryDTO.class, post.id, category.abbr, member.nickname, post.title, post.ip_addr, post.create_at, post.last_modified_at, post.post_like_count, post.comment_count, post.view_count))
+        JPAQuery<PostSummaryDTO> query = queryFactory.select(Projections.constructor(PostSummaryDTO.class, post.id, category.abbr, member.nickname, post.title, post.ipAddr, post.create_at, post.last_modified_at, post.post_like_count, post.comment_count, post.view_count))
                 .from(post)
                 .innerJoin(post.category, category)
                 .leftJoin(post.member, member)
@@ -61,7 +61,7 @@ public class PostQueryRepository {
     }
 
     public Optional<PostDetailDTO> findDetailById(Long postId) {
-        return em.createQuery("select p.id, c.name, c.abbr, m.nickname, p.ip_addr, p.last_modified_ip, p.create_at, p.last_modified_at, p.title, p.content, p.post_like_count, p.post_dislike_count, p.comment_count, p.view_count from Post p join p.category c on p.id = :postId left join p.member m", PostDetailDTO.class)
+        return em.createQuery("select p.id, c.name, c.abbr, m.nickname, p.ipAddr, p.last_modified_ip, p.create_at, p.last_modified_at, p.title, p.content, p.post_like_count, p.post_dislike_count, p.comment_count, p.view_count from Post p join p.category c on p.id = :postId left join p.member m", PostDetailDTO.class)
                 .setParameter("postId", postId).getResultList().stream().findFirst();
     }
 }

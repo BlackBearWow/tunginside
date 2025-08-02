@@ -29,7 +29,7 @@ public class PostSummaryDTO {
             this.nickname = post.getMember().getNickname();
         }
         this.title = post.getTitle();
-        this.ip_addr = post.getIp_addr();
+        this.ip_addr = post.getIpAddr();
         this.create_at = post.getCreate_at();
         this.last_modified_at = post.getLast_modified_at();
         this.post_like_count = post.getPost_like_count();

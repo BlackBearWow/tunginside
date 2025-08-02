@@ -10,7 +10,6 @@ import uman.tunginside.exception.BadRequestException;
 import uman.tunginside.repository.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -40,8 +39,6 @@ public class PostService {
     public PostListDTO getPostListDTOByConditions(PostGetForm postGetForm) {
         PostListDTO postListDTO = new PostListDTO();
         postListDTO.setTotalCount(postRepository.countByCondition(postGetForm.getAbbr(), postGetForm.getLike_cut(), postGetForm.getSearch()));
-//        List<Post> posts = postRepository.findByCondition(postGetForm.getAbbr(), postGetForm.getPage(), postGetForm.getLike_cut(), postGetForm.getSearch());
-//        postListDTO.setPosts(posts.stream().map(PostSummaryDTO::new).toList());
         postListDTO.setPosts(postQueryRepository.findByCondition(postGetForm.getAbbr(), postGetForm.getPage(),
                 postGetForm.getLike_cut(), postGetForm.getSearch(), postGetForm.getSize(), postGetForm.getOrderby()));
         return postListDTO;
@@ -71,7 +68,7 @@ public class PostService {
         // 2. 게시글의 비밀번호가 있고 보낸 비밀번호가 동일한 경우.
         if( (post.getMember() != null && optionalMember.isPresent() && post.getMember().getId().equals(optionalMember.get().getId()) ) ||
                 (post.getPassword() != null && post.getPassword().equals(password)) ) {
-            postRepository.remove(postId);
+            postRepository.delete(post);
         }
         else {
             throw new BadRequestException("자신이 쓴 게시글이 아니거나 비밀번호가 틀립니다");
@@ -89,9 +86,9 @@ public class PostService {
             postLike.setMember(optionalMember.get());
         }
         else {
-            postLikeRepository.findByPostAndIp(post, ip_addr)
+            postLikeRepository.findByPostAndIpAddr(post, ip_addr)
                     .ifPresent((pl)-> {throw new BadRequestException("좋아요는 게시물 하나당 한번씩 가능합니다");});
-            postLike.setIp_addr(ip_addr);
+            postLike.setIpAddr(ip_addr);
         }
         postLike.setPost(post);
         postLike.setCreated_at(LocalDateTime.now());
@@ -111,9 +108,9 @@ public class PostService {
             postDislike.setMember(optionalMember.get());
         }
         else {
-            postDislikeRepository.findByPostAndIp(post, ip_addr)
+            postDislikeRepository.findByPostAndIpAddr(post, ip_addr)
                     .ifPresent((pdl)->{throw new BadRequestException("싫어요는 게시물 하나당 한번씩 가능합니다");});
-            postDislike.setIp_addr(ip_addr);
+            postDislike.setIpAddr(ip_addr);
         }
         postDislike.setPost(post);
         postDislike.setCreated_at(LocalDateTime.now());

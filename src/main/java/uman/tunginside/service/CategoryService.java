@@ -28,7 +28,7 @@ public class CategoryService {
     public Long registerCategory(CategoryRegisterForm categoryRegisterForm, Long member_id) {
         Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("없는 회원입니다"));
         // 중복 이름 검색
-        if(categoryRepository.existByName(categoryRegisterForm.getName())) {
+        if(categoryRepository.existsByName(categoryRegisterForm.getName())) {
             throw new BadRequestException("이름이 이미 있습니다");
         }
         // 중복 줄임말 검색

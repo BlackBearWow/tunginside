@@ -25,8 +25,9 @@ public class PostDislike {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
+    @Column(name = "ip_addr")
     @Length(max = 15)
-    private String ip_addr;
+    private String ipAddr;
     @NotNull
     private LocalDateTime created_at;
 }
