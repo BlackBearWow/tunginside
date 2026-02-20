@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uman.tunginside.domain.category.Category;
 import uman.tunginside.domain.member.Member;
+import uman.tunginside.domain.member.MemberRole;
 import uman.tunginside.domain.post.*;
 import uman.tunginside.exception.BadRequestException;
 import uman.tunginside.repository.*;
@@ -61,13 +62,14 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(Long postId, String password, Long member_id) {
+    public void deletePost(Long postId, String password, Long member_id, MemberRole memberRole) {
         Optional<Member> optionalMember = memberRepository.findByIdNullable(member_id);
         Post post = postRepository.findById(postId).orElseThrow(() -> new BadRequestException("없는 게시글입니다"));
         // 1. 게시글의 member가 null이 아니고 세션이 있어야하고 세션과 동일인경우.
         // 2. 게시글의 비밀번호가 있고 보낸 비밀번호가 동일한 경우.
+        // 3. 역할이 ADMIN이면
         if( (post.getMember() != null && optionalMember.isPresent() && post.getMember().getId().equals(optionalMember.get().getId()) ) ||
-                (post.getPassword() != null && post.getPassword().equals(password)) ) {
+                (post.getPassword() != null && post.getPassword().equals(password)) || (memberRole == MemberRole.ADMIN)) {
             postRepository.delete(post);
         }
         else {

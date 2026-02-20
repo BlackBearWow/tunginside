@@ -2,21 +2,32 @@ package uman.tunginside.service;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uman.tunginside.domain.member.MemberLoginForm;
-import uman.tunginside.domain.member.Member;
-import uman.tunginside.domain.member.MemberSignupForm;
-import uman.tunginside.domain.member.MemberUpdateForm;
+import uman.tunginside.domain.member.*;
 import uman.tunginside.exception.*;
 import uman.tunginside.repository.MemberRepository;
+import uman.tunginside.security.MemberContext;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class MemberService {
+@Slf4j
+public class MemberService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public Long signup(MemberSignupForm memberSignupForm) {
@@ -31,26 +42,33 @@ public class MemberService {
         // 중복이 없다면 세이브
         Member member = new Member();
         member.setFromMemberSignupForm(memberSignupForm);
+        String encodedPw = passwordEncoder.encode(member.getPassword());
+        member.setPassword(encodedPw);
+
         memberRepository.save(member);
         return member.getId();
     }
 
-    public Long login(MemberLoginForm memberLoginForm) {
-        Member member = memberRepository.findByUserid(memberLoginForm.getUserid())
-                .orElseThrow(() -> new UseridException("존재하지 않는 멤버입니다."));
-        if (member.getPassword().equals(memberLoginForm.getPassword())) {
-            return member.getId();
-        }
-        else
-            throw new PasswordException("비밀번호가 일치하지 않습니다");
+//    public Long login(MemberLoginForm memberLoginForm) {
+//        Member member = memberRepository.findByUserid(memberLoginForm.getUserid())
+//                .orElseThrow(() -> new UseridException("존재하지 않는 멤버입니다."));
+//        if(passwordEncoder.matches(memberLoginForm.getPassword(), member.getPassword())) {
+//            return member.getId();
+//        }
+//        else
+//            throw new PasswordException("비밀번호가 일치하지 않습니다");
+//    }
+
+    public Member getMember(Long member_id) {
+        return memberRepository.findById(member_id).orElseThrow(()->new BadRequestException("없는 멤버입니다"));
     }
 
-    public Member getMember(Long id) {
-        return memberRepository.findById(id).orElseThrow(()->new BadRequestException("없는 멤버입니다"));
+    public Member getMemberByUserId(String userId) {
+        return memberRepository.findByUserid(userId).orElseThrow(()->new BadRequestException("없는 멤버입니다"));
     }
 
     @Transactional
-    public void update(MemberUpdateForm muf, Long member_id, HttpSession session) {
+    public void update(MemberUpdateForm muf, Long member_id) {
         Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("없는 멤버입니다"));
         // 현재 패스워드가 다르다면 에러
         if(!member.getPassword().equals(muf.getPassword())) {
@@ -80,5 +98,20 @@ public class MemberService {
     public void delete(Long member_id) {
         Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("멤버가 없습니다"));
         memberRepository.delete(member);
+    }
+
+    @Transactional
+    public void makeAdmin(Long member_id) {
+        Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("멤버가 없습니다"));
+        member.setRole(MemberRole.ADMIN);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//        log.info("username: {}", username);
+        Member member = memberRepository.findByUserid(username).orElseThrow();
+        //Role이 있다면 추가
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + member.getRole().toString()));
+        return new MemberContext(member, authorities);
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uman.tunginside.domain.comment.*;
 import uman.tunginside.domain.member.Member;
+import uman.tunginside.domain.member.MemberRole;
 import uman.tunginside.domain.post.Post;
 import uman.tunginside.exception.BadRequestException;
 import uman.tunginside.repository.CommentQueryRepository;
@@ -63,14 +64,15 @@ public class CommentService {
     }
 
     @Transactional
-    public void deleteComment(CommentDeleteDTO commentDeleteDTO, Long member_id) {
+    public void deleteComment(CommentDeleteDTO commentDeleteDTO, Long member_id, MemberRole memberRole) {
         Optional<Member> optionalMember = memberRepository.findByIdNullable(member_id);
         Comment comment = commentRepository.findById(commentDeleteDTO.getComment_id()).orElseThrow(() -> new BadRequestException("없는 댓글입니다"));
         Post post = comment.getPost();
         // 1. 댓글의 member가 null이 아니고 세션이 있어야하고 세션과 동일인경우.
         // 2. 댓글의 비밀번호가 있고 보낸 비밀번호가 동일한 경우.
+        // 3. 관리자일 경우
         if( (comment.getMember() != null && optionalMember.isPresent() && comment.getMember().getId().equals(optionalMember.get().getId()) ) ||
-                (comment.getPassword() != null && comment.getPassword().equals(commentDeleteDTO.getPassword())) ) {
+                (comment.getPassword() != null && comment.getPassword().equals(commentDeleteDTO.getPassword())) || (memberRole == MemberRole.ADMIN)) {
             // 대댓글이 있다면 삭제상태로 변경.
             if(commentRepository.findNestedCommentCount(comment) > 0) {
                 comment.setStatusDeleted();

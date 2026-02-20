@@ -7,8 +7,12 @@ import uman.tunginside.domain.category.Category;
 import uman.tunginside.domain.category.CategoryRegisterForm;
 import uman.tunginside.domain.member.Member;
 import uman.tunginside.exception.BadRequestException;
+import uman.tunginside.exception.ConflictException;
+import uman.tunginside.exception.ForbiddenException;
+import uman.tunginside.exception.UnauthorizedException;
 import uman.tunginside.repository.CategoryRepository;
 import uman.tunginside.repository.MemberRepository;
+import uman.tunginside.security.MemberContext;
 
 import java.util.List;
 
@@ -29,11 +33,11 @@ public class CategoryService {
         Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("없는 회원입니다"));
         // 중복 이름 검색
         if(categoryRepository.existsByName(categoryRegisterForm.getName())) {
-            throw new BadRequestException("이름이 이미 있습니다");
+            throw new ConflictException("이름이 이미 있습니다");
         }
         // 중복 줄임말 검색
         if(categoryRepository.existsByAbbr(categoryRegisterForm.getAbbr())) {
-            throw new BadRequestException("줄임말이 이미 있습니다");
+            throw new ConflictException("줄임말이 이미 있습니다");
         }
         // 중복 검사 통과라면 저장
         Category category = new Category();
@@ -49,9 +53,8 @@ public class CategoryService {
                 .orElseThrow(() -> new BadRequestException("없는 카테코리입니다"));
         if (category.getMember().getId().equals(member.getId())) {
             categoryRepository.delete(category);
-
         }
         else 
-            throw new BadRequestException("권한이 없습니다");
+            throw new ForbiddenException("권한이 없습니다");
     }
 }

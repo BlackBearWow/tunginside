@@ -26,6 +26,7 @@ public class InitData {
     @PostConstruct
     public void init() {
         Long member_id = memberService.signup(new MemberSignupForm("admin", "admin1", "관리자"));
+        memberService.makeAdmin(member_id);
         Long member_id2 = memberService.signup(new MemberSignupForm("guest", "guest1", "떠돌이"));
 
         Long categoryIdLol = categoryService.registerCategory(new CategoryRegisterForm("리그오브레전드", "lol"), member_id);
@@ -81,6 +82,8 @@ public class InitData {
         commentId = commentService.writeComment(postId, new CommentWriteForm("1234", "좀 알려줘라", commentId), null, "192.168.0.102");
 
         postId = postService.writePost(new PostWriteForm("sc", "님들 공격키 새끼손가락으로 누름 4번째 손가락으로 누름?", "나는 새끼손가락", "1234"), null, "192.168.0.104");
+        postService.postLike(postId, null, "192.168.0.211");
+        postService.postLike(postId, null, "192.168.0.212");
         commentId = commentService.writeComment(postId, new CommentWriteForm("1234", "나도 새끼손가락으로 누른다", null), null, "192.168.0.110");
         commentId = commentService.writeComment(postId, new CommentWriteForm("1234", "아니 어떻게 새끼손가락으로 누르냐? 당연히 4번째 손가락이지", commentId), null, "192.168.0.111");
         commentId = commentService.writeComment(postId, new CommentWriteForm("1234", "롤도 qwer 새끼손가락부터 시작하는게 정석인데 스타도 당연히 새끼손가락이지\n" +
@@ -97,5 +100,19 @@ public class InitData {
 
         postId = postService.writePost(new PostWriteForm("chzzk", "따효니 활협전 하는거", "한글 정발 나옴?\n" +
                 "왜 요즘 스트리머들 활협전하는거 다시 보이냐", "1234"), null, "192.168.0.108");
+        postService.postLike(postId, null, "192.168.0.211");
+
+        postId = postService.writePost(new PostWriteForm("sc", "김택용 공지", "운동하러왔습니다", "1234"), null, "192.168.0.107");
+        postId = postService.writePost(new PostWriteForm("sc", "기뉴다 공지", "오늘은 재욱이가 츠캄...", "1234"), null, "192.168.0.107");
+        postId = postService.writePost(new PostWriteForm("sc", "씨나인) 늑대 잡는", "암냠냠", "1234"), null, "192.168.0.107");
+        postId = postService.writePost(new PostWriteForm("sc", "택신) 왜냐맨 이새끼도", "말은 갓티어", "1234"), null, "192.168.0.107");
+        postId = postService.writePost(new PostWriteForm("sc", "택신) 아루미 그래도 지동원", "한테 다 말하면 어떡합니까", "1234"), null, "192.168.0.107");
+        postId = postService.writePost(new PostWriteForm("sc", "뉴캐슬)", "붓바이 키경호", "1234"), null, "192.168.0.107");
+        postId = postService.writePost(new PostWriteForm("sc", "[뉴캐슬] 끝장전 이기고", "좋아죽는 백갑", "1234"), null, "192.168.0.107");
+        postId = postService.writePost(new PostWriteForm("sc", "???: 고개를 들어라 김윤환", "그리고 이경민", "1234"), null, "192.168.0.107");
+        postId = postService.writePost(new PostWriteForm("sc", "츠캄) 지원ㅇ원 올킬 토마토 반응", "ㄷㄷㄷ", "1234"), null, "192.168.0.107");
+        postId = postService.writePost(new PostWriteForm("sc", "케이대) 내가먼지 - 오버드라이브", "썬라이트 옐로 오버 드라이브!", "1234"), null, "192.168.0.107");
+        postId = postService.writePost(new PostWriteForm("sc", "[YB]오메킴 - 2월4일공지", "이따뵙겠습니다", "1234"), member_id2, "192.168.0.107");
+        commentId = commentService.writeComment(postId, new CommentWriteForm("1234", "이걸 이제앎?", null), member_id2, "192.168.0.113");
     }
 }

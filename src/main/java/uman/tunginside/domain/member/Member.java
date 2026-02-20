@@ -26,12 +26,16 @@ public class Member {
     private Long id;
     @NotNull @Length(max = 20)
     private String userid;
-    @NotNull @Length(max = 20)
+    @Setter
+    @NotNull @Length(max = 60)
     private String password;
     @NotNull @Length(max = 20)
     private String nickname;
     @NotNull
     private LocalDateTime create_at;
+    @Setter
+    @Enumerated(EnumType.STRING)
+    private MemberRole role;
     @OneToMany(mappedBy = "member")
     private List<Category> categoryList = new ArrayList<>();
 
@@ -40,7 +44,17 @@ public class Member {
         this.password = memberSignupForm.getPassword();
         this.nickname = memberSignupForm.getNickname();
         this.create_at = LocalDateTime.now();
+        this.role = MemberRole.USER;
     }
+
+    public void setForStatelessSession(Long id, String userid, MemberRole memberRole) {
+        this.id = id;
+        this.userid = userid;
+        this.password = "temp password";
+        this.nickname = "temp nickname";
+        this.role = memberRole;
+    }
+
     public void update(MemberUpdateForm memberUpdateForm) {
         if(memberUpdateForm.getUserid() != null && !memberUpdateForm.getUserid().isBlank()) {
             this.userid = memberUpdateForm.getUserid();

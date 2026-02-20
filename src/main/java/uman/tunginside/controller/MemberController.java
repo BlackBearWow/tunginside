@@ -3,12 +3,15 @@ package uman.tunginside.controller;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import uman.tunginside.domain.member.MemberLoginForm;
 import uman.tunginside.domain.member.MemberResponseDTO;
 import uman.tunginside.domain.member.MemberSignupForm;
 import uman.tunginside.domain.member.MemberUpdateForm;
+import uman.tunginside.security.MemberContext;
 import uman.tunginside.service.MemberService;
 
 @RestController
@@ -26,40 +29,35 @@ public class MemberController {
         return "회원가입 성공";
     }
 
-    @PostMapping("/login")
-    public String login(@RequestBody @Validated MemberLoginForm memberLoginForm, HttpSession session) {
-        // 로그인. id와 password 검사는 service 계층에서 한다.
-        Long member_id = memberService.login(memberLoginForm);
-        // 세션 정보 저장
-        session.setAttribute("member_id", member_id);
-        return "로그인 성공";
-    }
+//    @PostMapping("/login")
+//    public MemberResponseDTO login(@RequestBody @Validated MemberLoginForm memberLoginForm, HttpSession session) {
+//        // 로그인. id와 password 검사는 service 계층에서 한다.
+//        Long member_id = memberService.login(memberLoginForm);
+//        // 세션 정보 저장
+//        session.setAttribute("member_id", member_id);
+//        return new MemberResponseDTO(memberService.getMember(member_id));
+//    }
 
     @GetMapping
-    public MemberResponseDTO getMemberInfo(@SessionAttribute Long member_id) {
-        return new MemberResponseDTO(memberService.getMember(member_id));
+    public MemberResponseDTO getMemberInfo(@AuthenticationPrincipal User user) {
+        return new MemberResponseDTO(memberService.getMemberByUserId(user.getUsername()));
     }
 
-    @PostMapping("/logout")
-    public String logout(HttpSession session) {
-        session.removeAttribute("member_id");
-        return "로그아웃";
-    }
-
-    @GetMapping("/is-login")
-    public boolean isLogin(@SessionAttribute(required = false) Long member_id) {
-        return member_id != null;
-    }
+//    @PostMapping("/logout")
+//    public String logout(HttpSession session) {
+//        session.removeAttribute("member_id");
+//        return "로그아웃";
+//    }
 
     @PutMapping
-    public String updateMember(@RequestBody @Validated MemberUpdateForm memberUpdateForm, @SessionAttribute Long member_id, HttpSession session) {
-        memberService.update(memberUpdateForm, member_id, session);
-        return "업데이트 성공";
+    public MemberResponseDTO updateMember(@RequestBody @Validated MemberUpdateForm memberUpdateForm, @AuthenticationPrincipal MemberContext memberContext) {
+        memberService.update(memberUpdateForm, memberContext.getId());
+        return new MemberResponseDTO(memberService.getMember(memberContext.getId()));
     }
 
     @DeleteMapping
-    public String deleteMember(@SessionAttribute Long member_id) {
-        memberService.delete(member_id);
+    public String deleteMember(@AuthenticationPrincipal MemberContext memberContext) {
+        memberService.delete(memberContext.getId());
         return "탈퇴 성공";
     }
 }

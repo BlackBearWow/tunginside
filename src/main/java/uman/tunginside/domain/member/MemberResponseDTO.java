@@ -13,13 +13,13 @@ import java.util.List;
 public class MemberResponseDTO {
     private String userid;
     private String nickname;
-    private LocalDateTime create_at;
+    private MemberRole role;
     private List<Category> categoryList;
 
     public MemberResponseDTO(Member member) {
         this.userid = member.getUserid();
         this.nickname = member.getNickname();
-        this.create_at = member.getCreate_at();
+        this.role = member.getRole();
         this.categoryList = member.getCategoryList();
     }
 }

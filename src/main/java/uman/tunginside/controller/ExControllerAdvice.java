@@ -1,5 +1,6 @@
 package uman.tunginside.controller;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -40,7 +41,7 @@ public class ExControllerAdvice {
         return errors;
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(UseridException.class)
     public Map<String, String> handleUseridException(UseridException ex) {
         Map<String, String> errors = new HashMap<>();
@@ -48,7 +49,7 @@ public class ExControllerAdvice {
         return errors;
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(NicknameException.class)
     public Map<String, String> handleDuplicateNicknameException(NicknameException ex) {
         Map<String, String> errors = new HashMap<>();
@@ -77,6 +78,38 @@ public class ExControllerAdvice {
     public Map<String, String> handleBadRequestException(BadRequestException ex) {
         Map<String, String> errors = new HashMap<>();
         errors.put("message", ex.getMessage());
+        return errors;
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(UnauthorizedException.class)
+    public Map<String, String> handleUnauthorizedException(UnauthorizedException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", ex.getMessage());
+        return errors;
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(ForbiddenException.class)
+    public Map<String, String> handleForbiddenException(ForbiddenException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", ex.getMessage());
+        return errors;
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(ConflictException.class)
+    public Map<String, String> handleConflictException(ConflictException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", ex.getMessage());
+        return errors;
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(ExpiredJwtException.class)
+    public Map<String, String> handleExpiredJwtException(ExpiredJwtException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", "토큰이 만료되었습니다. 다시 로그인하세요");
         return errors;
     }
 }

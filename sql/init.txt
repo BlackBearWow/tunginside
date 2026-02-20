@@ -14,3 +14,21 @@ GRANT ALL PRIVILEGES ON tunginside.* TO 'tungtungtung'@'localhost';
 
 변경 적용
 FLUSH PRIVILEGES;
+
+----- postgresql 방법 --------
+CREATE DATABASE tunginside;
+
+select datname from pg_database; 로 잘 생성되었는지 확인.
+
+-- 1. 유저 생성 (IDENTIFIED BY 대신 PASSWORD 사용)
+CREATE USER tungtungtung WITH PASSWORD 'sahur';
+
+-- 2. 해당 데이터베이스에 대한 모든 권한 부여
+GRANT ALL PRIVILEGES ON DATABASE tunginside TO tungtungtung;
+
+-- 3. (중요) 스키마 권한 부여
+-- PostgreSQL은 DB 권한 외에도 'public' 스키마 사용 권한이 필요합니다.
+-- tunginside 데이터베이스에 접속한 상태에서 아래를 실행하세요.
+GRANT ALL ON SCHEMA public TO tungtungtung;
+
+SELECT rolname, rolcanlogin FROM pg_roles WHERE rolname = 'tungtungtung'; 로 잘 됐는지 확인
