@@ -71,7 +71,7 @@ public class MemberService implements UserDetailsService {
     public void update(MemberUpdateForm muf, Long member_id) {
         Member member = memberRepository.findById(member_id).orElseThrow(() -> new BadRequestException("없는 멤버입니다"));
         // 현재 패스워드가 다르다면 에러
-        if(!member.getPassword().equals(muf.getPassword())) {
+        if(!passwordEncoder.matches(muf.getPassword(), member.getPassword())) {
             throw new PasswordException("비밀번호가 일치하지 않습니다");
         }
         // userid가 null이거나 빈칸이지 않고 자기자신의 아이디가 아니라면, 중복검사
@@ -91,6 +91,7 @@ public class MemberService implements UserDetailsService {
             throw new NewPasswordException("비밀번호는 영문, 숫자만 가능합니다. 영문, 숫자를 하나는 꼭 포함해야 합니다. 4~20자리여야 합니다");
         }
         // 중복이 없다면 업데이트
+        muf.setNewPassword(passwordEncoder.encode(muf.getNewPassword()));
         member.update(muf);
     }
 
@@ -108,10 +109,10 @@ public class MemberService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//        log.info("username: {}", username);
         Member member = memberRepository.findByUserid(username).orElseThrow();
         //Role이 있다면 추가
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + member.getRole().toString()));
+        log.info(member.getRole().toString());
         return new MemberContext(member, authorities);
     }
 }

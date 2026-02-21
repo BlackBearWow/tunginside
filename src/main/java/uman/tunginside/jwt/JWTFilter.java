@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -51,7 +53,8 @@ public class JWTFilter extends OncePerRequestFilter {
             // 세션에 저장할 정보 만들기
             Member member = new Member();
             member.setForStatelessSession(id, userid, memberRole);
-            MemberContext memberContext = new MemberContext(member, List.of());
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + member.getRole().toString()));
+            MemberContext memberContext = new MemberContext(member, authorities);
             // 스프링 시큐리티 인증 토큰 생성
             Authentication authToken = new UsernamePasswordAuthenticationToken(memberContext, null, memberContext.getAuthorities());
             // 세션에 사용자 등록
