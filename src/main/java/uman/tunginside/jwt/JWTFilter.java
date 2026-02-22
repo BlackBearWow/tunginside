@@ -66,7 +66,8 @@ public class JWTFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json");
-            response.getWriter().write("{\"message\":\"access token expired\"}");
+            // 토큰 만료는 다른 401에러와 구분하기 위해 code를 부여한다.
+            response.getWriter().write("{\"code\":\"TOKEN_EXPIRED\", \"message\":\"access token expired\"}");
             // 여기서 filterChain.doFilter를 호출하지 않고 끝낸다. 익명 사용자와 jwt토큰 만료 사용자를 구분하기 위해.
         } catch (SignatureException | MalformedJwtException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
