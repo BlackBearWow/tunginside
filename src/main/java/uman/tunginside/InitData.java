@@ -28,6 +28,8 @@ public class InitData {
         Long member_id = memberService.signup(new MemberSignupForm("admin", "admin1", "관리자"));
         memberService.makeAdmin(member_id);
         Long member_id2 = memberService.signup(new MemberSignupForm("guest", "guest1", "떠돌이"));
+        Long member_id3 = memberService.signup(new MemberSignupForm("qwer", "qwer1", "히나"));
+        Long member_id4 = memberService.signup(new MemberSignupForm("asdf", "asdf1", "뭉탱이"));
 
         Long categoryIdLol = categoryService.registerCategory(new CategoryRegisterForm("리그오브레전드", "lol"), member_id);
         Long categoryIdMp = categoryService.registerCategory(new CategoryRegisterForm("메이플스토리", "mp"), member_id);
@@ -35,6 +37,9 @@ public class InitData {
         Long categoryIdSc = categoryService.registerCategory(new CategoryRegisterForm("스타크래프트", "sc"), member_id);
         Long categoryIdSoop = categoryService.registerCategory(new CategoryRegisterForm("숲(soop)", "soop"), member_id);
         Long categoryIdChzzk = categoryService.registerCategory(new CategoryRegisterForm("치지직", "chzzk"), member_id);
+        Long categoryIdMovieTv = categoryService.registerCategory(new CategoryRegisterForm("영화/TV", "movietv"), member_id);
+        Long categoryIdMGame = categoryService.registerCategory(new CategoryRegisterForm("모바일게임", "mgame"), member_id);
+        Long categoryIdLostark = categoryService.registerCategory(new CategoryRegisterForm("로스트아크", "lostark"), member_id);
 
         Long postId = postService.writePost(new PostWriteForm("lol", "여러분 제가 오늘 어이없는 일을 겪었는데요", "여러분 제가 오늘 어이없는 일을 겪었는데요...\n" +
                 "원래 탕후루란게 제철이고 수요많은 과일들로 만드는거 아닌가요...?\n" +
@@ -112,7 +117,22 @@ public class InitData {
         postId = postService.writePost(new PostWriteForm("sc", "???: 고개를 들어라 김윤환", "그리고 이경민", "1234"), null, "192.168.0.107");
         postId = postService.writePost(new PostWriteForm("sc", "츠캄) 지원ㅇ원 올킬 토마토 반응", "ㄷㄷㄷ", "1234"), null, "192.168.0.107");
         postId = postService.writePost(new PostWriteForm("sc", "케이대) 내가먼지 - 오버드라이브", "썬라이트 옐로 오버 드라이브!", "1234"), null, "192.168.0.107");
-        postId = postService.writePost(new PostWriteForm("sc", "[YB]오메킴 - 2월4일공지", "이따뵙겠습니다", "1234"), member_id2, "192.168.0.107");
+        postId = postService.writePost(new PostWriteForm("sc", "[YB]오메킴 - 2월4일공지", "이따뵙겠습니다", null), member_id2, "192.168.0.107");
         commentId = commentService.writeComment(postId, new CommentWriteForm("1234", "이걸 이제앎?", null), member_id2, "192.168.0.113");
+
+        postId = postService.writePost(new PostWriteForm("lostark", "ㅇㅂ)눈가루", "스포트라이트에서 딜하는건 ㅅㅂ ㅋㅋㅋㅋㅋ", null), member_id3, "192.168.0.107");
+        postId = postService.writePost(new PostWriteForm("lostark", "악세 뭔가뭔가네", "현생때문에 당분간 본캐만 하려고 배럭들 다 정리했는데 \n" +
+                "\n" +
+                "상중에서 상상 올리려고 보고있는데 상상 매물이 진짜 최악이네 맘에 드는게 없다.. ", "1234"), null, "192.168.0.107");
+        postId = postService.writePost(new PostWriteForm("lostark", "님들 모코코 탈 포장 뜯은거 딴 직업엔 못보내죠...?", "방법 절대 없죠?\n" +
+                "\n" +
+                "크아아아아악", null), member_id4, "192.168.0.107");
+        postId = postService.writePost(new PostWriteForm("lostark", "아직도 신규진입하는 뉴비 생각보다 많은거같음", "원래 이정도 비수기되면 지역챗에\n" +
+                "\n" +
+                "\"겜망했네(원대렙 320 본캐렙 1680)\"\n" +
+                "\n" +
+                "\"ㅈ재학이 그렇죠뭐(원대렙 280 본캐렙 1690)\"\n" +
+                "\n" +
+                "이런놈들밖에없어야하는데 아직도 질문글올라옴.", null), member_id3, "192.168.0.107");
     }
 }
