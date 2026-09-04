@@ -5,13 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import uman.tunginside.QuerydslConfig;
 import uman.tunginside.domain.category.Category;
 import uman.tunginside.domain.category.CategoryRegisterForm;
 import uman.tunginside.domain.member.Member;
 import uman.tunginside.domain.member.MemberSignupForm;
 
 @DataJpaTest
-@Import({CategoryRepository.class, MemberRepository.class})
+@Import(QuerydslConfig.class)
 class CategoryRepositoryTest {
 
     @Autowired private CategoryRepository categoryRepository;

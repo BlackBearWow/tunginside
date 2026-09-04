@@ -17,7 +17,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
-@Import({MemberRepository.class, CategoryRepository.class, PostRepository.class, QuerydslConfig.class})
+@Import(QuerydslConfig.class)
 class PostRepositoryTest {
 
     @Autowired private CategoryRepository categoryRepository;

@@ -1,7 +1,7 @@
 package uman.tunginside;
 
 import org.junit.jupiter.api.Test;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import uman.tunginside.domain.category.CategoryRegisterForm;
@@ -15,13 +15,12 @@ import uman.tunginside.service.PostService;
 
 @ActiveProfiles("test")
 @SpringBootTest
-@RequiredArgsConstructor
 class TunginsideApplicationTests {
 
-	private final MemberService memberService;
-	private final CategoryService categoryService;
-	private final PostService postService;
-	private final CommentService commentService;
+	@Autowired private MemberService memberService;
+	@Autowired private CategoryService categoryService;
+	@Autowired private PostService postService;
+	@Autowired private CommentService commentService;
 
 	@Test
 	void 전체테스트() {

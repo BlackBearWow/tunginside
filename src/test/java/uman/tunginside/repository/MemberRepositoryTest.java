@@ -6,14 +6,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
+import uman.tunginside.QuerydslConfig;
 import uman.tunginside.domain.member.Member;
 import uman.tunginside.domain.member.MemberSignupForm;
 
 import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
+@Import(QuerydslConfig.class)
 //@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(MemberRepository.class)
 class MemberRepositoryTest {
 
     @Autowired private MemberRepository memberRepository;
@@ -28,7 +30,7 @@ class MemberRepositoryTest {
         // when
         memberRepository.save(member);
         // then
-        Assertions.assertThrows(ConstraintViolationException.class, () -> memberRepository.save(member1));
+        Assertions.assertThrows(DataIntegrityViolationException.class, () -> memberRepository.saveAndFlush(member1));
     }
 
     @Test
@@ -41,7 +43,7 @@ class MemberRepositoryTest {
         // when
         memberRepository.save(member);
         // then
-        Assertions.assertThrows(ConstraintViolationException.class, () -> memberRepository.save(member1));
+        Assertions.assertThrows(DataIntegrityViolationException.class, () -> memberRepository.saveAndFlush(member1));
     }
 
     @Test
