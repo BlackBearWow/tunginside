@@ -13,7 +13,7 @@ import uman.tunginside.service.CommentService;
 import uman.tunginside.service.MemberService;
 import uman.tunginside.service.PostService;
 
-@Component
+//@Component
 @Profile("!test")
 @RequiredArgsConstructor
 public class InitData {
